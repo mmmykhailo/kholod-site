@@ -1,47 +1,59 @@
-import { Link, useLoaderData } from "react-router";
+import { strapi } from "@strapi/client";
+import type { LoaderFunctionArgs } from "react-router";
+import { useLoaderData, data } from "react-router";
+import BlockRenderer from "~/lib/BlockRenderer";
 import type { Route } from "./+types/_index";
-import { getArticles, type Article } from "~/lib/strapi";
 
-export function meta() {
+export function meta({ loaderData }: Route.MetaArgs) {
+  if (!loaderData?.page) {
+    return [{ title: "Page Not Found" }];
+  }
   return [
-    { title: "Articles" },
-    { name: "description", content: "Browse our articles" },
+    { title: loaderData.page.Title },
+    { name: "description", content: loaderData.page.Title },
   ];
 }
 
-export async function loader() {
-  const articles = await getArticles();
-  return { articles };
+export async function loader({ params }: LoaderFunctionArgs) {
+  const strapiClient = strapi({
+    baseURL: "http://localhost:1337/api",
+  });
+
+  const response = await strapiClient.collection("pages").find({
+    filters: {
+      slug: {
+        $eq: params.slug || "home",
+      },
+    },
+    populate: {
+      blocks: true,
+    },
+  });
+
+  const page = response.data?.[0] || null;
+
+  console.log(page.blocks);
+
+  if (!page) {
+    throw data({ message: "Page not found" }, { status: 404 });
+  }
+
+  return { page };
 }
 
-export default function Home({ loaderData }: Route.ComponentProps) {
-  const { articles } = loaderData;
+export default function Page() {
+  const { page } = useLoaderData<typeof loader>();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8 text-gray-900">Articles</h1>
+        <h1 className="text-4xl font-bold mb-8">{page.Title}</h1>
 
-        {articles.length === 0 ? (
-          <p className="text-gray-600">No articles found.</p>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {articles.map((article) => (
-              <Link
-                key={article.id}
-                to={`/articles/${article.slug}`}
-                className="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6"
-              >
-                <h2 className="text-xl font-semibold mb-2 text-gray-900">
-                  {article.title}
-                </h2>
-                <p className="text-sm text-gray-500">
-                  {new Date(article.createdAt).toLocaleDateString()}
-                </p>
-              </Link>
-            ))}
-          </div>
-        )}
+        <div className="bg-white rounded-lg shadow-md p-8">
+          {(page.blocks as Array<unknown>)?.map((block, i) => (
+            <BlockRenderer key={i} block={block} />
+          ))}
+        </div>
       </div>
     </div>
   );
