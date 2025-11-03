@@ -15,7 +15,7 @@
     }
   },
   "attributes": {
-    "Title": {
+    "title": {
       "type": "string",
       "pluginOptions": {
         "i18n": {
@@ -30,7 +30,6 @@
           "localized": true
         }
       },
-      "targetField": "Title",
       "required": true
     },
     "seo": {
@@ -56,6 +55,18 @@
         "shared.quote",
         "shared.media"
       ]
+    },
+    "childrenPages": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::page.page",
+      "mappedBy": "parentPage"
+    },
+    "parentPage": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::page.page",
+      "inversedBy": "childrenPages"
     }
   }
 }
