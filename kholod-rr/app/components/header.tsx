@@ -72,44 +72,27 @@ type HeaderProps = {
 
 export default function Header({ navigationItems }: HeaderProps) {
   return (
-    <div className="border-b">
-      <div className="container mx-auto">
-        <NavigationMenu>
-          <NavigationMenuList>
-            {navigationItems.map((item) => {
-              const hasChildren = item.items && item.items.length > 0;
-
-              return (
-                <NavigationMenuItem key={item.documentId}>
-                  {hasChildren ? (
-                    <>
-                      <Link to={item.path} className="block">
-                        <NavigationMenuTrigger className={itemClassName}>
-                          {item.title}
-                        </NavigationMenuTrigger>
-                      </Link>
-                      <NavigationMenuContent>
-                        <ul className="grid gap-4 p-2 md:w-[400px] lg:w-[500px]">
-                          {item.items?.map((subItem) => (
-                            <NestedNavigationItem
-                              key={subItem.documentId}
-                              item={subItem}
-                              level={0}
-                            />
-                          ))}
-                        </ul>
-                      </NavigationMenuContent>
-                    </>
-                  ) : (
-                    <NavigationMenuLink asChild className={itemClassName}>
-                      <Link to={item.path}>{item.title}</Link>
-                    </NavigationMenuLink>
-                  )}
-                </NavigationMenuItem>
-              );
-            })}
-          </NavigationMenuList>
-        </NavigationMenu>
+    <div>
+      <div className="border-b">
+        <div className="container mx-auto flex justify-end items-center gap-6 px-4 py-2">
+          <a href="tel:+380504000817" className="font-medium">
+            +38(050)400-08-17
+          </a>
+          <a href="tel:+380673889948" className="font-medium">
+            +38(067)388-99-48
+          </a>
+        </div>
+      </div>
+      <div className="border-b">
+        <div className="container mx-auto">
+          {navigationItems.map((item) => {
+            return (
+              <Link to={item.path} className={itemClassName}>
+                {item.title}
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -3,8 +3,8 @@ import { useLoaderData, data, Link } from "react-router";
 import BlockRenderer from "~/lib/block-renderer";
 import type { Route } from "./+types/$";
 import Header from "~/components/header";
-import type { MainNavigationItems } from "~/lib/types/main-navigation";
 import type { Page } from "~/lib/types/page";
+import { fetchNavigation, fetchPage } from "~/lib/http";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   if (!loaderData?.page) {
@@ -17,29 +17,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
 export async function loader({ params }: LoaderFunctionArgs) {
   const splat = params["*"];
 
-  const baseURL = "http://localhost:1337/api";
-
-  const pageResponse = await fetch(
-    `${baseURL}/pages/${splat || "home"}?populate[blocks]=true`,
-  );
-
-  if (!pageResponse.ok) {
-    throw data({ message: "Page not found" }, { status: 404 });
-  }
-
-  const page: Page = await pageResponse.json();
-
-  const navResponse = await fetch(
-    `${baseURL}/navigation/render/agxhqhpkugvgtalcztlckvzm?type=TREE`,
-  );
-
-  const nav: MainNavigationItems = await navResponse.json();
-
-  if (!page) {
-    throw data({ message: "Page not found" }, { status: 404 });
-  }
-
-  console.log(page.blocks);
+  const [page, nav] = await Promise.all([fetchPage(splat), fetchNavigation()]);
 
   return { page, nav };
 }
