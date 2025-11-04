@@ -8,6 +8,7 @@
     "image": {
       "type": "media",
       "multiple": false,
+      "required": true,
       "allowedTypes": [
         "images",
         "files",
@@ -16,9 +17,13 @@
       ]
     },
     "title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "description": {
+      "type": "string"
+    },
+    "url": {
       "type": "string"
     }
   },
