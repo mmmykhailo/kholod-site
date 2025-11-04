@@ -42,20 +42,6 @@
       "component": "shared.seo",
       "repeatable": false
     },
-    "blocks": {
-      "type": "dynamiczone",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      },
-      "components": [
-        "shared.slider",
-        "shared.rich-text",
-        "shared.quote",
-        "shared.media"
-      ]
-    },
     "childrenPages": {
       "type": "relation",
       "relation": "oneToMany",
@@ -67,6 +53,19 @@
       "relation": "manyToOne",
       "target": "api::page.page",
       "inversedBy": "childrenPages"
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "components": [
+        "shared.rich-text",
+        "shared.three-images-banner",
+        "shared.image-banner"
+      ]
     }
   }
 }

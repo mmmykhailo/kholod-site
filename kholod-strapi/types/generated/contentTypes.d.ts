@@ -447,7 +447,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
   };
   attributes: {
     blocks: Schema.Attribute.DynamicZone<
-      ['shared.slider', 'shared.rich-text', 'shared.quote', 'shared.media']
+      ['shared.rich-text', 'shared.three-images-banner', 'shared.image-banner']
     > &
       Schema.Attribute.SetPluginOptions<{
         i18n: {

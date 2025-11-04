@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_shared_three_images_banners",
+  "info": {
+    "displayName": "ThreeImagesBanner"
+  },
+  "options": {},
+  "attributes": {
+    "firstBanner": {
+      "type": "component",
+      "component": "shared.image-banner",
+      "repeatable": false
+    },
+    "secondBanner": {
+      "type": "component",
+      "component": "shared.image-banner",
+      "repeatable": false
+    },
+    "thirdBanner": {
+      "type": "component",
+      "component": "shared.image-banner",
+      "repeatable": false
+    }
+  },
+  "config": {}
+}

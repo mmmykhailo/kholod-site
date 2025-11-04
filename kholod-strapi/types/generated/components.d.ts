@@ -1,24 +1,13 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
-export interface SharedMedia extends Struct.ComponentSchema {
-  collectionName: 'components_shared_media';
+export interface SharedImageBanner extends Struct.ComponentSchema {
+  collectionName: 'components_shared_image_banners';
   info: {
-    displayName: 'Media';
-    icon: 'file-video';
+    displayName: 'ImageBanner';
   };
   attributes: {
-    file: Schema.Attribute.Media<'images' | 'files' | 'videos'>;
-  };
-}
-
-export interface SharedQuote extends Struct.ComponentSchema {
-  collectionName: 'components_shared_quotes';
-  info: {
-    displayName: 'Quote';
-    icon: 'indent';
-  };
-  attributes: {
-    body: Schema.Attribute.Text;
+    description: Schema.Attribute.String;
+    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     title: Schema.Attribute.String;
   };
 }
@@ -50,26 +39,25 @@ export interface SharedSeo extends Struct.ComponentSchema {
   };
 }
 
-export interface SharedSlider extends Struct.ComponentSchema {
-  collectionName: 'components_shared_sliders';
+export interface SharedThreeImagesBanner extends Struct.ComponentSchema {
+  collectionName: 'components_shared_three_images_banners';
   info: {
-    description: '';
-    displayName: 'Slider';
-    icon: 'address-book';
+    displayName: 'ThreeImagesBanner';
   };
   attributes: {
-    files: Schema.Attribute.Media<'images', true>;
+    firstBanner: Schema.Attribute.Component<'shared.image-banner', false>;
+    secondBanner: Schema.Attribute.Component<'shared.image-banner', false>;
+    thirdBanner: Schema.Attribute.Component<'shared.image-banner', false>;
   };
 }
 
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
-      'shared.media': SharedMedia;
-      'shared.quote': SharedQuote;
+      'shared.image-banner': SharedImageBanner;
       'shared.rich-text': SharedRichText;
       'shared.seo': SharedSeo;
-      'shared.slider': SharedSlider;
+      'shared.three-images-banner': SharedThreeImagesBanner;
     }
   }
 }
