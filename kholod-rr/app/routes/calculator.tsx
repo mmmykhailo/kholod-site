@@ -39,7 +39,7 @@ import { ceilToFraction } from "~/lib/ceilToFraction";
 
 export function meta() {
   return [
-    { title: "Калькулятор" },
+    { title: "Розрахунок вартості штор" },
     { name: "description", content: "Калькулятор розрахунку шторів" },
   ];
 }
@@ -159,7 +159,7 @@ export default function Calculator() {
     <div className="min-h-screen pb-16">
       <Header navigationItems={nav} />
       <Container className="mt-8">
-        <h1 className="text-4xl font-bold mb-8">Калькулятор</h1>
+        <h1 className="text-4xl font-bold mb-8">Розрахунок вартості штор</h1>
 
         <div className="grid gap-8 lg:grid-cols-2">
           <Card>
@@ -243,7 +243,7 @@ export default function Calculator() {
                     </FieldContent>
                   </Field>
 
-                  <div className="grid grid-cols-2 gap-y-7 gap-x-4">
+                  <div className="grid md:grid-cols-2 gap-y-7 gap-x-4">
                     <Field>
                       <FieldLabel htmlFor="overlap">Нахлист (мм)</FieldLabel>
                       <FieldContent>
