@@ -1,0 +1,38 @@
+export const STRIP_WIDTHS = [200, 300] as const;
+
+export const STRIP_TYPES = {
+  200: [
+    { value: "200×1.7", label: "200×1.7", pricePerMeter: 100 },
+    { value: "200×2", label: "200×2", pricePerMeter: 120 },
+    { value: "200×2 матова", label: "200×2 матова", pricePerMeter: 130 },
+  ],
+  300: [
+    { value: "300×2", label: "300×2", pricePerMeter: 150 },
+    { value: "300×2 матова", label: "300×2 матова", pricePerMeter: 160 },
+    { value: "300×2 ребро", label: "300×2 ребро", pricePerMeter: 170 },
+  ],
+} as const;
+
+export const OVERLAP_OPTIONS = [0, 25, 50, 75, 100] as const;
+
+export const PLANK_TYPES = [
+  { value: "нержавійка", label: "Нержавійка", price: 50 },
+  { value: "оцинковка", label: "Оцинковка", price: 30 },
+] as const;
+
+export const CORNICE_TYPES = [
+  {
+    value: "нержавійка",
+    label: "Нержавійка",
+    pricePerItem: 264,
+    itemLength: 1.25,
+    itemFractionToCeil: 0.5,
+  },
+  {
+    value: "оцинковка",
+    label: "Оцинковка",
+    pricePerItem: 156,
+    itemLength: 1.25,
+    itemFractionToCeil: 0.5,
+  },
+] as const;
