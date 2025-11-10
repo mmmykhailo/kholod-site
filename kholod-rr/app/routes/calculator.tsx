@@ -61,9 +61,13 @@ interface CalculationResult {
   numberOfStrips: number;
   totalRibbonLength: number;
   ribbonPrice: number;
+  ribbonPricePerMeter: number;
   numberOfPlanks: number;
   planksPrice: number;
+  plankPricePerPiece: number;
   cornicePrice: number;
+  numberOfCorniceItems: number;
+  cornicePricePerItem: number;
   totalPrice: number;
 }
 
@@ -118,6 +122,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
   corniceMeters = ceilToFraction(corniceMeters, corniceItemLength / 2);
 
   const cornicePrice = corniceMeters * cornicePricePerMeter;
+  const numberOfCorniceItems = corniceMeters / corniceItemLength;
 
   // Calculate total price
   const totalPrice = ribbonPrice + planksPrice + cornicePrice;
@@ -134,9 +139,13 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
     numberOfStrips,
     totalRibbonLength,
     ribbonPrice,
+    ribbonPricePerMeter,
     numberOfPlanks,
     planksPrice,
+    plankPricePerPiece,
     cornicePrice,
+    numberOfCorniceItems,
+    cornicePricePerItem,
     totalPrice,
   } as CalculationResult;
 }
@@ -361,6 +370,10 @@ export default function Calculator() {
                     <Item>
                       <ItemContent>
                         <ItemTitle>Вартість стрічки</ItemTitle>
+                        <div className="text-xs text-muted-foreground">
+                          ({(result.totalRibbonLength / 1000).toFixed(2)}м ×{" "}
+                          {result.ribbonPricePerMeter.toFixed(2)} грн/м)
+                        </div>
                       </ItemContent>
                       <ItemContent>
                         <ItemTitle>
@@ -385,6 +398,10 @@ export default function Calculator() {
                     <Item>
                       <ItemContent>
                         <ItemTitle>Вартість планок</ItemTitle>
+                        <div className="text-xs text-muted-foreground">
+                          ({result.numberOfPlanks} шт ×{" "}
+                          {result.plankPricePerPiece.toFixed(2)} грн/шт)
+                        </div>
                       </ItemContent>
                       <ItemContent>
                         <ItemTitle>
@@ -398,6 +415,11 @@ export default function Calculator() {
                     <Item>
                       <ItemContent>
                         <ItemTitle>Вартість карнізу</ItemTitle>
+                        <div className="text-xs text-muted-foreground">
+                          ({result.width}мм ={" "}
+                          {result.numberOfCorniceItems.toFixed(1)} штук ×{" "}
+                          {result.cornicePricePerItem.toFixed(2)} грн)
+                        </div>
                       </ItemContent>
                       <ItemContent>
                         <ItemTitle>
