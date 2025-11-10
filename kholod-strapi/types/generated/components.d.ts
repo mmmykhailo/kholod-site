@@ -22,7 +22,7 @@ export interface SharedRichText extends Struct.ComponentSchema {
     icon: 'align-justify';
   };
   attributes: {
-    body: Schema.Attribute.RichText;
+    body: Schema.Attribute.RichText & Schema.Attribute.Required;
   };
 }
 
@@ -47,9 +47,12 @@ export interface SharedThreeImagesBanner extends Struct.ComponentSchema {
     displayName: 'ThreeImagesBanner';
   };
   attributes: {
-    firstBanner: Schema.Attribute.Component<'shared.image-banner', false>;
-    secondBanner: Schema.Attribute.Component<'shared.image-banner', false>;
-    thirdBanner: Schema.Attribute.Component<'shared.image-banner', false>;
+    firstBanner: Schema.Attribute.Component<'shared.image-banner', false> &
+      Schema.Attribute.Required;
+    secondBanner: Schema.Attribute.Component<'shared.image-banner', false> &
+      Schema.Attribute.Required;
+    thirdBanner: Schema.Attribute.Component<'shared.image-banner', false> &
+      Schema.Attribute.Required;
   };
 }
 

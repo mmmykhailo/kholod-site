@@ -8,17 +8,20 @@
     "firstBanner": {
       "type": "component",
       "component": "shared.image-banner",
-      "repeatable": false
+      "repeatable": false,
+      "required": true
     },
     "secondBanner": {
       "type": "component",
       "component": "shared.image-banner",
-      "repeatable": false
+      "repeatable": false,
+      "required": true
     },
     "thirdBanner": {
       "type": "component",
       "component": "shared.image-banner",
-      "repeatable": false
+      "repeatable": false,
+      "required": true
     }
   },
   "config": {}
