@@ -17,13 +17,6 @@ export default function MagnetCalculatorForm() {
       <FieldGroup>
         <div className="grid grid-cols-2 gap-y-7 gap-x-4">
           <Field>
-            <FieldLabel htmlFor="width">Ширина (мм)</FieldLabel>
-            <FieldContent>
-              <Input required id="width" name="width" type="number" step="1" />
-            </FieldContent>
-          </Field>
-
-          <Field>
             <FieldLabel htmlFor="height">Висота (мм)</FieldLabel>
             <FieldContent>
               <Input
@@ -33,6 +26,13 @@ export default function MagnetCalculatorForm() {
                 type="number"
                 step="1"
               />
+            </FieldContent>
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="width">Ширина (мм)</FieldLabel>
+            <FieldContent>
+              <Input required id="width" name="width" type="number" step="1" />
             </FieldContent>
           </Field>
         </div>

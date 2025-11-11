@@ -17,7 +17,7 @@ import {
 } from "~/lib/constants/calculator";
 import type { Route } from "./+types/calculator";
 import { ceilToFraction } from "~/lib/ceilToFraction";
-import RegularCalculatorForm from "~/components/calculator/RegularCalculatorForm";
+import MagnetCalculatorForm from "~/components/calculator/MagnetCalculatorForm";
 
 export function meta() {
   return [
@@ -160,7 +160,9 @@ export default function Calculator() {
     <div className="min-h-screen pb-16">
       <Header navigationItems={nav} />
       <Container className="mt-8">
-        <h1 className="text-4xl font-bold mb-8">Розрахунок вартості штор</h1>
+        <h1 className="text-4xl font-bold mb-8">
+          Розрахунок вартості магнітних штор
+        </h1>
 
         <div className="grid gap-8 lg:grid-cols-2">
           <div>
@@ -169,7 +171,7 @@ export default function Calculator() {
                 <CardTitle>Параметри розрахунку</CardTitle>
               </CardHeader>
               <CardContent>
-                <RegularCalculatorForm />
+                <MagnetCalculatorForm />
               </CardContent>
             </Card>
           </div>

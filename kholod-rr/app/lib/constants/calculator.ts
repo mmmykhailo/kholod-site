@@ -1,15 +1,3 @@
-export const calculatorFormTypes = [
-  {
-    value: "regular",
-    label: "Звичайні",
-  },
-  {
-    value: "magnet",
-    label: "Магнітні",
-  },
-] as const;
-export type CalculatorFormType = (typeof calculatorFormTypes)[number]["value"];
-
 const STRIP_TYPES = [
   { value: "200×1.7", label: "200×1.7", pricePerMeter: 100, width: 200 },
   { value: "200×2", label: "200×2", pricePerMeter: 120, width: 200 },
