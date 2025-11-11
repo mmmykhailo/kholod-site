@@ -1,6 +1,5 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { Form, useActionData, useLoaderData } from "react-router";
-import { useState } from "react";
 import Header from "~/components/header";
 import Container from "~/components/ui/container";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -27,7 +26,6 @@ import {
 } from "~/components/ui/select";
 import { fetchNavigation } from "~/lib/http";
 import {
-  STRIP_WIDTHS,
   STRIP_TYPES,
   OVERLAP_OPTIONS,
   PLANK_TYPES,
@@ -76,14 +74,16 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 
   const width = parseFloat(formData.get("width") as string);
   const height = parseFloat(formData.get("height") as string);
-  const stripWidth = parseInt(formData.get("stripWidth") as string) as
-    | 200
-    | 300;
   const stripType = formData.get("stripType") as string;
   const overlap = parseInt(formData.get("overlap") as string);
   const addExtraStrip = formData.get("addExtraStrip") === "true";
   const corniceType = formData.get("corniceType") as string;
   const plankType = formData.get("plankType") as string;
+
+  // Get strip type data and extract width
+  const stripTypeData = STRIP_TYPES.find((st) => st.value === stripType);
+  const stripWidth = stripTypeData?.width || 200;
+  const ribbonPricePerMeter = stripTypeData?.pricePerMeter || 0;
 
   // Calculate number of strips
   const effectiveStripWidth = stripWidth - overlap;
@@ -95,11 +95,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
   // Calculate total ribbon length
   const totalRibbonLength = numberOfStrips * height;
 
-  // Get prices from constants
-  const stripTypeData = STRIP_TYPES[stripWidth].find(
-    (st) => st.value === stripType,
-  );
-  const ribbonPricePerMeter = stripTypeData?.pricePerMeter || 0;
+  // Calculate ribbon price
   const ribbonPrice = (totalRibbonLength / 1000) * ribbonPricePerMeter;
 
   // Calculate planks price
@@ -153,7 +149,6 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 export default function Calculator() {
   const { nav } = useLoaderData<typeof loader>();
   const result = useActionData<CalculationResult>();
-  const [stripWidth, setStripWidth] = useState<200 | 300>(200);
 
   return (
     <div className="min-h-screen pb-16">
@@ -162,140 +157,54 @@ export default function Calculator() {
         <h1 className="text-4xl font-bold mb-8">Розрахунок вартості штор</h1>
 
         <div className="grid gap-8 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Параметри розрахунку</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Form method="post">
-                <FieldGroup>
-                  <div className="grid grid-cols-2 gap-y-7 gap-x-4">
-                    <Field>
-                      <FieldLabel htmlFor="width">Ширина (мм)</FieldLabel>
-                      <FieldContent>
-                        <Input
-                          required
-                          id="width"
-                          name="width"
-                          type="number"
-                          step="1"
-                        />
-                      </FieldContent>
-                    </Field>
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Параметри розрахунку</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Form method="post">
+                  <FieldGroup>
+                    <div className="grid grid-cols-2 gap-y-7 gap-x-4">
+                      <Field>
+                        <FieldLabel htmlFor="width">Ширина (мм)</FieldLabel>
+                        <FieldContent>
+                          <Input
+                            required
+                            id="width"
+                            name="width"
+                            type="number"
+                            step="1"
+                          />
+                        </FieldContent>
+                      </Field>
+
+                      <Field>
+                        <FieldLabel htmlFor="height">Висота (мм)</FieldLabel>
+                        <FieldContent>
+                          <Input
+                            required
+                            id="height"
+                            name="height"
+                            type="number"
+                            step="1"
+                          />
+                        </FieldContent>
+                      </Field>
+                    </div>
 
                     <Field>
-                      <FieldLabel htmlFor="height">Висота (мм)</FieldLabel>
-                      <FieldContent>
-                        <Input
-                          required
-                          id="height"
-                          name="height"
-                          type="number"
-                          step="1"
-                        />
-                      </FieldContent>
-                    </Field>
-                  </div>
-
-                  <Field>
-                    <FieldLabel htmlFor="stripWidth">Ширина смуги</FieldLabel>
-                    <FieldContent>
-                      <Select
-                        name="stripWidth"
-                        value={stripWidth.toString()}
-                        onValueChange={(value) =>
-                          setStripWidth(parseInt(value) as 200 | 300)
-                        }
-                      >
-                        <SelectTrigger id="stripWidth">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {STRIP_WIDTHS.map((width) => (
-                            <SelectItem key={width} value={width.toString()}>
-                              {width} мм
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FieldContent>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="stripType">Тип смуги</FieldLabel>
-                    <FieldContent>
-                      <Select
-                        name="stripType"
-                        defaultValue={STRIP_TYPES[stripWidth][0].value}
-                        key={stripWidth}
-                      >
-                        <SelectTrigger id="stripType">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {STRIP_TYPES[stripWidth].map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FieldContent>
-                  </Field>
-
-                  <div className="grid md:grid-cols-2 gap-y-7 gap-x-4">
-                    <Field>
-                      <FieldLabel htmlFor="overlap">Нахлист (мм)</FieldLabel>
-                      <FieldContent>
-                        <Select name="overlap" defaultValue="0">
-                          <SelectTrigger id="overlap">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {OVERLAP_OPTIONS.map((overlap) => (
-                              <SelectItem
-                                key={overlap}
-                                value={overlap.toString()}
-                              >
-                                {overlap} мм
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FieldContent>
-                    </Field>
-
-                    <Field>
-                      <FieldLabel htmlFor="addExtraStrip">
-                        Додати додаткову смугу
-                      </FieldLabel>
-                      <FieldContent>
-                        <Select name="addExtraStrip" defaultValue="false">
-                          <SelectTrigger id="addExtraStrip" defaultValue="true">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="false">Ні</SelectItem>
-                            <SelectItem value="true">Так</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FieldContent>
-                    </Field>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-y-7 gap-x-4">
-                    <Field>
-                      <FieldLabel htmlFor="corniceType">Тип карнізу</FieldLabel>
+                      <FieldLabel htmlFor="stripType">Тип смуги</FieldLabel>
                       <FieldContent>
                         <Select
-                          name="corniceType"
-                          defaultValue={CORNICE_TYPES[0].value}
+                          name="stripType"
+                          defaultValue={STRIP_TYPES[0].value}
                         >
-                          <SelectTrigger id="corniceType">
+                          <SelectTrigger id="stripType">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {CORNICE_TYPES.map((type) => (
+                            {STRIP_TYPES.map((type) => (
                               <SelectItem key={type.value} value={type.value}>
                                 {type.label}
                               </SelectItem>
@@ -305,35 +214,103 @@ export default function Calculator() {
                       </FieldContent>
                     </Field>
 
-                    <Field>
-                      <FieldLabel htmlFor="plankType">Тип планки</FieldLabel>
-                      <FieldContent>
-                        <Select
-                          name="plankType"
-                          defaultValue={PLANK_TYPES[0].value}
-                        >
-                          <SelectTrigger id="plankType">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {PLANK_TYPES.map((type) => (
-                              <SelectItem key={type.value} value={type.value}>
-                                {type.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FieldContent>
-                    </Field>
-                  </div>
-                </FieldGroup>
+                    <div className="grid md:grid-cols-2 gap-y-7 gap-x-4">
+                      <Field>
+                        <FieldLabel htmlFor="overlap">Нахлист (мм)</FieldLabel>
+                        <FieldContent>
+                          <Select name="overlap" defaultValue="0">
+                            <SelectTrigger id="overlap">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {OVERLAP_OPTIONS.map((overlap) => (
+                                <SelectItem
+                                  key={overlap}
+                                  value={overlap.toString()}
+                                >
+                                  {overlap} мм
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FieldContent>
+                      </Field>
 
-                <Button type="submit" className="mt-6 w-full">
-                  Розрахувати
-                </Button>
-              </Form>
-            </CardContent>
-          </Card>
+                      <Field>
+                        <FieldLabel htmlFor="addExtraStrip">
+                          Додати додаткову смугу
+                        </FieldLabel>
+                        <FieldContent>
+                          <Select name="addExtraStrip" defaultValue="false">
+                            <SelectTrigger
+                              id="addExtraStrip"
+                              defaultValue="true"
+                            >
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="false">Ні</SelectItem>
+                              <SelectItem value="true">Так</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FieldContent>
+                      </Field>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-y-7 gap-x-4">
+                      <Field>
+                        <FieldLabel htmlFor="corniceType">
+                          Тип карнізу
+                        </FieldLabel>
+                        <FieldContent>
+                          <Select
+                            name="corniceType"
+                            defaultValue={CORNICE_TYPES[0].value}
+                          >
+                            <SelectTrigger id="corniceType">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {CORNICE_TYPES.map((type) => (
+                                <SelectItem key={type.value} value={type.value}>
+                                  {type.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FieldContent>
+                      </Field>
+
+                      <Field>
+                        <FieldLabel htmlFor="plankType">Тип планки</FieldLabel>
+                        <FieldContent>
+                          <Select
+                            name="plankType"
+                            defaultValue={PLANK_TYPES[0].value}
+                          >
+                            <SelectTrigger id="plankType">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {PLANK_TYPES.map((type) => (
+                                <SelectItem key={type.value} value={type.value}>
+                                  {type.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FieldContent>
+                      </Field>
+                    </div>
+                  </FieldGroup>
+
+                  <Button type="submit" className="mt-6 w-full">
+                    Розрахувати
+                  </Button>
+                </Form>
+              </CardContent>
+            </Card>
+          </div>
 
           {result && (
             <div>
