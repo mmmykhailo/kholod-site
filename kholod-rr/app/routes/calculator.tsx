@@ -1,5 +1,6 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { Form, useActionData, useLoaderData } from "react-router";
+import { useActionData, useLoaderData } from "react-router";
+import { useState } from "react";
 import Header from "~/components/header";
 import Container from "~/components/ui/container";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -9,7 +10,6 @@ import {
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field";
-import { Button } from "~/components/ui/button";
 import {
   Item,
   ItemContent,
@@ -26,14 +26,15 @@ import {
 } from "~/components/ui/select";
 import { fetchNavigation } from "~/lib/http";
 import {
-  STRIP_TYPES,
-  OVERLAP_OPTIONS,
-  PLANK_TYPES,
-  CORNICE_TYPES,
+  regularCalculator,
+  magnetCalculator,
+  type CalculatorFormType,
+  calculatorFormTypes,
 } from "~/lib/constants/calculator";
 import type { Route } from "./+types/calculator";
-import { Input } from "~/components/ui/input";
 import { ceilToFraction } from "~/lib/ceilToFraction";
+import RegularCalculatorForm from "~/components/calculator/RegularCalculatorForm";
+import MagnetCalculatorForm from "~/components/calculator/MagnetCalculatorForm";
 
 export function meta() {
   return [
@@ -80,8 +81,10 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
   const corniceType = formData.get("corniceType") as string;
   const plankType = formData.get("plankType") as string;
 
-  // Get strip type data and extract width
-  const stripTypeData = STRIP_TYPES.find((st) => st.value === stripType);
+  // Get strip type data and extract width (same for both calculators)
+  const stripTypeData = regularCalculator.stripTypes.find(
+    (st) => st.value === stripType,
+  );
   const stripWidth = stripTypeData?.width || 200;
   const ribbonPricePerMeter = stripTypeData?.pricePerMeter || 0;
 
@@ -100,14 +103,34 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 
   // Calculate planks price
   const numberOfPlanks = numberOfStrips;
-  const plankData = PLANK_TYPES.find((pt) => pt.value === plankType);
-  const plankPricePerPiece = plankData?.price || 0;
+  let plankPricePerPiece = 0;
+
+  // Check if using magnet calculator (алюміній)
+  if (plankType === magnetCalculator.plankType.value) {
+    plankPricePerPiece = magnetCalculator.plankType.price;
+  } else {
+    const plankData = regularCalculator.plankTypes.find(
+      (pt) => pt.value === plankType,
+    );
+    plankPricePerPiece = plankData?.price || 0;
+  }
   const planksPrice = numberOfPlanks * plankPricePerPiece;
 
   // Calculate cornice price
-  const corniceData = CORNICE_TYPES.find((ct) => ct.value === corniceType);
-  const cornicePricePerItem = corniceData?.pricePerItem || 0;
-  const corniceItemLength = corniceData?.itemLength || 0;
+  let cornicePricePerItem = 0;
+  let corniceItemLength = 0;
+
+  // Check if using magnet calculator (алюміній)
+  if (corniceType === magnetCalculator.corniceType.value) {
+    cornicePricePerItem = magnetCalculator.corniceType.pricePerItem;
+    corniceItemLength = magnetCalculator.corniceType.itemLength;
+  } else {
+    const corniceData = regularCalculator.corniceTypes.find(
+      (ct) => ct.value === corniceType,
+    );
+    cornicePricePerItem = corniceData?.pricePerItem || 0;
+    corniceItemLength = corniceData?.itemLength || 0;
+  }
   const cornicePricePerMeter = cornicePricePerItem / corniceItemLength;
 
   let corniceMeters = width / 1000;
@@ -149,6 +172,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 export default function Calculator() {
   const { nav } = useLoaderData<typeof loader>();
   const result = useActionData<CalculationResult>();
+  const [variation, setVariation] = useState<CalculatorFormType>("regular");
 
   return (
     <div className="min-h-screen pb-16">
@@ -163,151 +187,35 @@ export default function Calculator() {
                 <CardTitle>Параметри розрахунку</CardTitle>
               </CardHeader>
               <CardContent>
-                <Form method="post">
-                  <FieldGroup>
-                    <div className="grid grid-cols-2 gap-y-7 gap-x-4">
-                      <Field>
-                        <FieldLabel htmlFor="width">Ширина (мм)</FieldLabel>
-                        <FieldContent>
-                          <Input
-                            required
-                            id="width"
-                            name="width"
-                            type="number"
-                            step="1"
-                          />
-                        </FieldContent>
-                      </Field>
-
-                      <Field>
-                        <FieldLabel htmlFor="height">Висота (мм)</FieldLabel>
-                        <FieldContent>
-                          <Input
-                            required
-                            id="height"
-                            name="height"
-                            type="number"
-                            step="1"
-                          />
-                        </FieldContent>
-                      </Field>
-                    </div>
-
-                    <Field>
-                      <FieldLabel htmlFor="stripType">Тип смуги</FieldLabel>
-                      <FieldContent>
-                        <Select
-                          name="stripType"
-                          defaultValue={STRIP_TYPES[0].value}
-                        >
-                          <SelectTrigger id="stripType">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {STRIP_TYPES.map((type) => (
-                              <SelectItem key={type.value} value={type.value}>
-                                {type.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FieldContent>
-                    </Field>
-
-                    <div className="grid md:grid-cols-2 gap-y-7 gap-x-4">
-                      <Field>
-                        <FieldLabel htmlFor="overlap">Нахлист (мм)</FieldLabel>
-                        <FieldContent>
-                          <Select name="overlap" defaultValue="0">
-                            <SelectTrigger id="overlap">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {OVERLAP_OPTIONS.map((overlap) => (
-                                <SelectItem
-                                  key={overlap}
-                                  value={overlap.toString()}
-                                >
-                                  {overlap} мм
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FieldContent>
-                      </Field>
-
-                      <Field>
-                        <FieldLabel htmlFor="addExtraStrip">
-                          Додати додаткову смугу
-                        </FieldLabel>
-                        <FieldContent>
-                          <Select name="addExtraStrip" defaultValue="false">
-                            <SelectTrigger
-                              id="addExtraStrip"
-                              defaultValue="true"
-                            >
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="false">Ні</SelectItem>
-                              <SelectItem value="true">Так</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FieldContent>
-                      </Field>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-y-7 gap-x-4">
-                      <Field>
-                        <FieldLabel htmlFor="corniceType">
-                          Тип карнізу
-                        </FieldLabel>
-                        <FieldContent>
-                          <Select
-                            name="corniceType"
-                            defaultValue={CORNICE_TYPES[0].value}
-                          >
-                            <SelectTrigger id="corniceType">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {CORNICE_TYPES.map((type) => (
-                                <SelectItem key={type.value} value={type.value}>
-                                  {type.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FieldContent>
-                      </Field>
-
-                      <Field>
-                        <FieldLabel htmlFor="plankType">Тип планки</FieldLabel>
-                        <FieldContent>
-                          <Select
-                            name="plankType"
-                            defaultValue={PLANK_TYPES[0].value}
-                          >
-                            <SelectTrigger id="plankType">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {PLANK_TYPES.map((type) => (
-                                <SelectItem key={type.value} value={type.value}>
-                                  {type.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FieldContent>
-                      </Field>
-                    </div>
-                  </FieldGroup>
-
-                  <Button type="submit" className="mt-6 w-full">
-                    Розрахувати
-                  </Button>
-                </Form>
+                <div className="grid grid-cols-2 gap-x-4 mb-7">
+                  <Field>
+                    <FieldLabel htmlFor="variation">Тип штор</FieldLabel>
+                    <FieldContent>
+                      <Select
+                        value={variation}
+                        onValueChange={(value) =>
+                          setVariation(value as CalculatorFormType)
+                        }
+                      >
+                        <SelectTrigger id="variation">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {calculatorFormTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FieldContent>
+                  </Field>
+                </div>
+                {variation === "regular" ? (
+                  <RegularCalculatorForm />
+                ) : (
+                  <MagnetCalculatorForm />
+                )}
               </CardContent>
             </Card>
           </div>
