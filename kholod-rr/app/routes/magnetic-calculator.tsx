@@ -11,13 +11,9 @@ import {
   ItemTitle,
 } from "~/components/ui/item";
 import { fetchNavigation } from "~/lib/http";
-import {
-  regularCalculator,
-  magnetCalculator,
-} from "~/lib/constants/calculator";
 import type { Route } from "./+types/calculator";
-import { ceilToFraction } from "~/lib/ceilToFraction";
 import MagnetCalculatorForm from "~/components/calculator/MagnetCalculatorForm";
+import { calculateCurtainPrice, type CalculationResult } from "~/lib/calculateCurtainPrice";
 
 export function meta() {
   return [
@@ -31,128 +27,18 @@ export async function loader({ params }: LoaderFunctionArgs) {
   return { nav };
 }
 
-interface CalculationResult {
-  width: number;
-  height: number;
-  stripWidth: number;
-  stripType: string;
-  overlap: number;
-  addExtraStrip: boolean;
-  corniceType: string;
-  plankType: string;
-  numberOfStrips: number;
-  totalRibbonLength: number;
-  ribbonPrice: number;
-  ribbonPricePerMeter: number;
-  numberOfPlanks: number;
-  planksPrice: number;
-  plankPricePerPiece: number;
-  cornicePrice: number;
-  numberOfCorniceItems: number;
-  cornicePricePerItem: number;
-  totalPrice: number;
-}
-
 export async function clientAction({ request }: Route.ClientActionArgs) {
   const formData = await request.formData();
 
-  const width = parseFloat(formData.get("width") as string);
-  const height = parseFloat(formData.get("height") as string);
-  const stripType = formData.get("stripType") as string;
-  const overlap = parseInt(formData.get("overlap") as string);
-  const addExtraStrip = formData.get("addExtraStrip") === "true";
-  const corniceType = formData.get("corniceType") as string;
-  const plankType = formData.get("plankType") as string;
-
-  // Get strip type data and extract width (same for both calculators)
-  const stripTypeData = regularCalculator.stripTypes.find(
-    (st) => st.value === stripType,
-  );
-  const stripWidth = stripTypeData?.width || 200;
-  const ribbonPricePerMeter = stripTypeData?.pricePerMeter || 0;
-
-  // Calculate number of strips
-  const effectiveStripWidth = stripWidth - overlap;
-  let numberOfStrips = Math.max(
-    1,
-    Math.ceil(width / effectiveStripWidth - overlap / effectiveStripWidth),
-  );
-  if (addExtraStrip) {
-    numberOfStrips += 1;
-  }
-
-  // Calculate total ribbon length
-  const totalRibbonLength = numberOfStrips * height;
-
-  // Calculate ribbon price
-  const ribbonPrice = (totalRibbonLength / 1000) * ribbonPricePerMeter;
-
-  // Calculate planks price
-  const numberOfPlanks = numberOfStrips;
-  let plankPricePerPiece = 0;
-
-  // Check if using magnet calculator (алюміній)
-  if (plankType === magnetCalculator.plankType.value) {
-    plankPricePerPiece = magnetCalculator.plankType.price;
-  } else {
-    const plankData = regularCalculator.plankTypes.find(
-      (pt) => pt.value === plankType,
-    );
-    plankPricePerPiece = plankData?.price || 0;
-  }
-  const planksPrice = numberOfPlanks * plankPricePerPiece;
-
-  // Calculate cornice price
-  let cornicePricePerItem = 0;
-  let corniceItemLength = 0;
-
-  // Check if using magnet calculator (алюміній)
-  if (corniceType === magnetCalculator.corniceType.value) {
-    cornicePricePerItem = magnetCalculator.corniceType.pricePerItem;
-    corniceItemLength = magnetCalculator.corniceType.itemLength;
-  } else {
-    const corniceData = regularCalculator.corniceTypes.find(
-      (ct) => ct.value === corniceType,
-    );
-    cornicePricePerItem = corniceData?.pricePerItem || 0;
-    corniceItemLength = corniceData?.itemLength || 0;
-  }
-  const cornicePricePerMeter = cornicePricePerItem / corniceItemLength;
-
-  let corniceMeters = width / 1000;
-  if (corniceMeters < corniceItemLength) {
-    corniceMeters = corniceItemLength;
-  }
-
-  corniceMeters = ceilToFraction(corniceMeters, corniceItemLength / 2);
-
-  const cornicePrice = corniceMeters * cornicePricePerMeter;
-  const numberOfCorniceItems = corniceMeters / corniceItemLength;
-
-  // Calculate total price
-  const totalPrice = ribbonPrice + planksPrice + cornicePrice;
-
-  return {
-    width,
-    height,
-    stripWidth,
-    stripType,
-    overlap,
-    addExtraStrip,
-    corniceType,
-    plankType,
-    numberOfStrips,
-    totalRibbonLength,
-    ribbonPrice,
-    ribbonPricePerMeter,
-    numberOfPlanks,
-    planksPrice,
-    plankPricePerPiece,
-    cornicePrice,
-    numberOfCorniceItems,
-    cornicePricePerItem,
-    totalPrice,
-  } as CalculationResult;
+  return calculateCurtainPrice({
+    width: parseFloat(formData.get("width") as string),
+    height: parseFloat(formData.get("height") as string),
+    stripType: formData.get("stripType") as string,
+    overlap: parseInt(formData.get("overlap") as string),
+    addExtraStrip: formData.get("addExtraStrip") === "true",
+    corniceType: formData.get("corniceType") as string,
+    plankType: formData.get("plankType") as string,
+  });
 }
 
 export default function Calculator() {
