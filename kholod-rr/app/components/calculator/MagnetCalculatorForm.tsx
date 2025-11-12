@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Form } from "react-router";
 import { Field, FieldContent, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
@@ -12,6 +13,21 @@ import { Button } from "../ui/button";
 import { magnetCalculator } from "~/lib/constants/calculator";
 
 export default function MagnetCalculatorForm() {
+  const [selectedStripType, setSelectedStripType] = useState<string>(
+    magnetCalculator.stripTypes[0].value,
+  );
+
+  // Get the strip width for the selected strip type
+  const selectedStripData = magnetCalculator.stripTypes.find(
+    (st) => st.value === selectedStripType,
+  );
+  const selectedStripWidth = selectedStripData?.width || 200;
+
+  // Filter plank types by strip width
+  const availablePlankTypes = magnetCalculator.plankTypes.filter(
+    (pt) => pt.stripWidth === selectedStripWidth,
+  );
+
   return (
     <Form method="post">
       <FieldGroup>
@@ -42,7 +58,8 @@ export default function MagnetCalculatorForm() {
           <FieldContent>
             <Select
               name="stripType"
-              defaultValue={magnetCalculator.stripTypes[0].value}
+              value={selectedStripType}
+              onValueChange={setSelectedStripType}
             >
               <SelectTrigger id="stripType">
                 <SelectValue />
@@ -74,7 +91,7 @@ export default function MagnetCalculatorForm() {
       <input
         type="hidden"
         name="plankId"
-        value={magnetCalculator.plankType.id}
+        value={availablePlankTypes[0]?.value}
       />
 
       <Button type="submit" className="mt-6 w-full">

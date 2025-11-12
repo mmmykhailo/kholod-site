@@ -76,15 +76,18 @@ export function calculateCurtainPrice(
   const numberOfPlanks = numberOfStrips;
   let plankPricePerPiece = 0;
 
-  // Check if using magnet calculator (алюміній)
-  if (plankType === magnetCalculator.plankType.value) {
-    plankPricePerPiece = magnetCalculator.plankType.price;
-  } else {
-    const plankData = regularCalculator.plankTypes.find(
+  // Try to find plank in regular calculator first, then magnetic calculator
+  let plankData = regularCalculator.plankTypes.find(
+    (pt) => pt.value === plankType,
+  );
+
+  if (!plankData) {
+    plankData = magnetCalculator.plankTypes.find(
       (pt) => pt.value === plankType,
     );
-    plankPricePerPiece = plankData?.price || 0;
   }
+
+  plankPricePerPiece = plankData?.price || 0;
   const planksPrice = numberOfPlanks * plankPricePerPiece;
 
   // Calculate cornice price
