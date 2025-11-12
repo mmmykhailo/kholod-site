@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Form } from "react-router";
 import { Field, FieldContent, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
@@ -12,6 +13,21 @@ import { regularCalculator } from "~/lib/constants/calculator";
 import { Button } from "../ui/button";
 
 export default function RegularCalculatorForm() {
+  const [selectedStripType, setSelectedStripType] = useState<string>(
+    regularCalculator.stripTypes[0].value,
+  );
+
+  // Get the strip width for the selected strip type
+  const selectedStripData = regularCalculator.stripTypes.find(
+    (st) => st.value === selectedStripType,
+  );
+  const selectedStripWidth = selectedStripData?.width || 200;
+
+  // Filter plank types by strip width
+  const availablePlankTypes = regularCalculator.plankTypes.filter(
+    (pt) => pt.stripWidth === selectedStripWidth,
+  );
+
   return (
     <Form method="post">
       <FieldGroup>
@@ -42,7 +58,8 @@ export default function RegularCalculatorForm() {
           <FieldContent>
             <Select
               name="stripType"
-              defaultValue={regularCalculator.stripTypes[0].value}
+              value={selectedStripType}
+              onValueChange={setSelectedStripType}
             >
               <SelectTrigger id="stripType">
                 <SelectValue />
@@ -122,13 +139,14 @@ export default function RegularCalculatorForm() {
             <FieldContent>
               <Select
                 name="plankType"
-                defaultValue={regularCalculator.plankTypes[0].value}
+                defaultValue={availablePlankTypes[0]?.value}
+                key={selectedStripType}
               >
                 <SelectTrigger id="plankType">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {regularCalculator.plankTypes.map((type) => (
+                  {availablePlankTypes.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       {type.label}
                     </SelectItem>

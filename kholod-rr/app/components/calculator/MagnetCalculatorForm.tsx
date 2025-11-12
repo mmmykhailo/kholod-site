@@ -73,8 +73,8 @@ export default function MagnetCalculatorForm() {
       />
       <input
         type="hidden"
-        name="plankType"
-        value={magnetCalculator.plankType.value}
+        name="plankId"
+        value={magnetCalculator.plankType.id}
       />
 
       <Button type="submit" className="mt-6 w-full">

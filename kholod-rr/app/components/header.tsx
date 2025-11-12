@@ -87,7 +87,11 @@ export default function Header({ navigationItems }: HeaderProps) {
         <div className="container mx-auto">
           {navigationItems.map((item) => {
             return (
-              <Link to={item.path} className={itemClassName}>
+              <Link
+                key={item.documentId}
+                to={item.path}
+                className={itemClassName}
+              >
                 {item.title}
               </Link>
             );

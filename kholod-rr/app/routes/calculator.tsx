@@ -13,7 +13,10 @@ import {
 import { fetchNavigation } from "~/lib/http";
 import type { Route } from "./+types/calculator";
 import RegularCalculatorForm from "~/components/calculator/RegularCalculatorForm";
-import { calculateCurtainPrice, type CalculationResult } from "~/lib/calculateCurtainPrice";
+import {
+  calculateCurtainPrice,
+  type CalculationResult,
+} from "~/lib/calculateCurtainPrice";
 
 export function meta() {
   return [

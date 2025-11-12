@@ -1,4 +1,7 @@
-import { regularCalculator, magnetCalculator } from "~/lib/constants/calculator";
+import {
+  regularCalculator,
+  magnetCalculator,
+} from "~/lib/constants/calculator";
 import { ceilToFraction } from "~/lib/ceilToFraction";
 
 export interface CalculationResult {
@@ -33,8 +36,18 @@ export interface CalculationInput {
   plankType: string;
 }
 
-export function calculateCurtainPrice(input: CalculationInput): CalculationResult {
-  const { width, height, stripType, overlap, addExtraStrip, corniceType, plankType } = input;
+export function calculateCurtainPrice(
+  input: CalculationInput,
+): CalculationResult {
+  const {
+    width,
+    height,
+    stripType,
+    overlap,
+    addExtraStrip,
+    corniceType,
+    plankType,
+  } = input;
 
   // Get strip type data and extract width (same for both calculators)
   const stripTypeData = regularCalculator.stripTypes.find(
