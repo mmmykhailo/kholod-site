@@ -3,6 +3,13 @@ const STRIP_TYPES = [
   { value: "300×2", label: "300×2", pricePerMeter: 140, width: 300 },
 ] as const;
 
+export type PlankTypeData = {
+  value: string;
+  stripWidth: number;
+  label: string;
+  price: number;
+};
+
 export const regularCalculator = {
   stripTypes: STRIP_TYPES,
   overlapOptions: [0, 25, 50, 75, 100, 125, 150] as const,
@@ -31,7 +38,7 @@ export const regularCalculator = {
       label: "Оцинковка",
       price: 28,
     },
-  ] as const,
+  ] satisfies Array<PlankTypeData>,
   corniceTypes: [
     {
       value: "нержавійка",
@@ -65,7 +72,7 @@ export const magnetCalculator = {
       label: "Алюміній",
       price: 0,
     },
-  ] as const,
+  ] satisfies Array<PlankTypeData>,
   corniceType: {
     value: "алюміній",
     label: "Алюміній",
