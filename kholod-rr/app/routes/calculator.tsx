@@ -73,7 +73,10 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 
   // Calculate number of strips
   const effectiveStripWidth = stripWidth - overlap;
-  let numberOfStrips = Math.ceil(width / effectiveStripWidth);
+  let numberOfStrips = Math.max(
+    1,
+    Math.ceil(width / effectiveStripWidth - overlap / effectiveStripWidth),
+  );
   if (addExtraStrip) {
     numberOfStrips += 1;
   }
