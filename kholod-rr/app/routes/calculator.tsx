@@ -87,6 +87,17 @@ export default function Calculator() {
 
                     <Item>
                       <ItemContent>
+                        <ItemTitle>Реальна ширина штори</ItemTitle>
+                      </ItemContent>
+                      <ItemContent>
+                        <ItemTitle>{result.realCurtainWidth} мм</ItemTitle>
+                      </ItemContent>
+                    </Item>
+
+                    <ItemSeparator />
+
+                    <Item>
+                      <ItemContent>
                         <ItemTitle>Загальна довжина стрічки</ItemTitle>
                       </ItemContent>
                       <ItemContent>

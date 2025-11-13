@@ -14,6 +14,7 @@ export interface CalculationResult {
   corniceType: string;
   plankType: string;
   numberOfStrips: number;
+  realCurtainWidth: number;
   totalRibbonLength: number;
   ribbonPrice: number;
   ribbonPricePerMeter: number;
@@ -65,6 +66,9 @@ export function calculateCurtainPrice(
   if (addExtraStrip) {
     numberOfStrips += 1;
   }
+
+  // Calculate real curtain width
+  const realCurtainWidth = numberOfStrips * stripWidth - (numberOfStrips - 1) * overlap;
 
   // Calculate total ribbon length
   const totalRibbonLength = numberOfStrips * height;
@@ -130,6 +134,7 @@ export function calculateCurtainPrice(
     corniceType,
     plankType,
     numberOfStrips,
+    realCurtainWidth,
     totalRibbonLength,
     ribbonPrice,
     ribbonPricePerMeter,
