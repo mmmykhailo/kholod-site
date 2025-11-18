@@ -8,7 +8,11 @@ export default factories.createCoreController(
       if (!slug) return ctx.badRequest("Missing slug parameter");
 
       const populate = {
-        childrenCategories: true,
+        childrenCategories: {
+          populate: {
+            image: true,
+          },
+        },
         products: {
           populate: {
             images: true,
@@ -55,7 +59,11 @@ export default factories.createCoreController(
       let currentCategory = null;
 
       const populate = {
-        childrenCategories: true,
+        childrenCategories: {
+          populate: {
+            image: true,
+          },
+        },
         products: {
           populate: {
             images: true,
