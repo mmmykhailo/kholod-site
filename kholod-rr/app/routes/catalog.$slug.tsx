@@ -87,25 +87,27 @@ export default function CategoryPage() {
           )}
 
         {/* Products */}
-        <div>
-          <h2 className="text-2xl font-bold mb-6">
-            Товари {!!products?.length && `(${products.length})`}
-          </h2>
+        {(!category.childrenCategories || !!products?.length) && (
+          <div>
+            <h2 className="text-2xl font-bold mb-6">
+              Товари {!!products?.length && `(${products.length})`}
+            </h2>
 
-          {!products?.length ? (
-            <div className="text-center py-12 bg-muted rounded-lg">
-              <p className="text-muted-foreground">
-                В цій категорії поки немає товарів
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          )}
-        </div>
+            {!products?.length ? (
+              <div className="text-center py-12 bg-muted rounded-lg">
+                <p className="text-muted-foreground">
+                  В цій категорії поки немає товарів
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </Container>
     </>
   );
