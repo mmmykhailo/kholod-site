@@ -3,6 +3,7 @@ import { useState } from "react";
 import { fetchProductBySlug, fetchNavigation } from "~/lib/http";
 import Header from "~/components/header";
 import Container from "~/components/ui/container";
+import { Breadcrumbs } from "~/components/breadcrumbs";
 import { strapiUrl } from "~/lib/urls";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
@@ -41,40 +42,18 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
     ? marked.parse(product.description)
     : "";
 
+  const breadcrumbs = [
+    { label: "Головна", href: "/" },
+    { label: "Каталог", href: "/catalog" },
+    { label: product.category.name, href: `/catalog/${product.category.slug}` },
+    { label: product.name },
+  ];
+
   return (
     <>
       <Header navigationItems={navigation} />
       <Container className="py-12">
-        {/* Breadcrumbs */}
-        <nav className="mb-6 text-sm text-muted-foreground">
-          <ol className="flex items-center space-x-2">
-            <li>
-              <Link to="/" className="hover:text-foreground transition-colors">
-                Головна
-              </Link>
-            </li>
-            <li>/</li>
-            <li>
-              <Link
-                to="/catalog"
-                className="hover:text-foreground transition-colors"
-              >
-                Каталог
-              </Link>
-            </li>
-            <li>/</li>
-            <li>
-              <Link
-                to={`/catalog/${product.category.slug}`}
-                className="hover:text-foreground transition-colors"
-              >
-                {product.category.name}
-              </Link>
-            </li>
-            <li>/</li>
-            <li className="text-foreground font-medium">{product.name}</li>
-          </ol>
-        </nav>
+        <Breadcrumbs items={breadcrumbs} className="mb-6" />
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Product Images */}

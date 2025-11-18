@@ -4,8 +4,9 @@ import Header from "~/components/header";
 import Container from "~/components/ui/container";
 import { ProductCard } from "~/components/product-card";
 import { CategoryCard } from "~/components/category-card";
+import { Breadcrumbs } from "~/components/breadcrumbs";
 import { strapiUrl } from "~/lib/urls";
-import { Link, useLoaderData } from "react-router";
+import { useLoaderData } from "react-router";
 
 export async function loader({ params }: Route.LoaderArgs) {
   const [category, navigation] = await Promise.all([
@@ -24,31 +25,17 @@ export default function CategoryPage() {
   const imageUrl = category.image ? `${strapiUrl}${category.image.url}` : null;
   const products = category.products;
 
+  const breadcrumbs = [
+    { label: "Головна", href: "/" },
+    { label: "Каталог", href: "/catalog" },
+    { label: category.name },
+  ];
+
   return (
     <>
       <Header navigationItems={navigation} />
       <Container className="py-12">
-        {/* Breadcrumbs */}
-        <nav className="mb-6 text-sm text-muted-foreground">
-          <ol className="flex items-center space-x-2">
-            <li>
-              <Link to="/" className="hover:text-foreground transition-colors">
-                Головна
-              </Link>
-            </li>
-            <li>/</li>
-            <li>
-              <Link
-                to="/catalog"
-                className="hover:text-foreground transition-colors"
-              >
-                Каталог
-              </Link>
-            </li>
-            <li>/</li>
-            <li className="text-foreground font-medium">{category.name}</li>
-          </ol>
-        </nav>
+        <Breadcrumbs items={breadcrumbs} className="mb-6" />
 
         {/* Category Header */}
         <div className="mb-12">

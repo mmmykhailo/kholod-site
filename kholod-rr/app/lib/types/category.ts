@@ -1,4 +1,5 @@
 import type { Image } from "./image";
+import type { Product } from "./product";
 
 export type Category = {
   id: number;
@@ -8,6 +9,7 @@ export type Category = {
   description?: string;
   parentCategory?: Category;
   childrenCategories?: Category[];
+  products?: Product[];
   image?: Image;
   seo?: {
     metaTitle?: string;
