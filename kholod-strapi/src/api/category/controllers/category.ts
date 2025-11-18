@@ -15,6 +15,23 @@ export default factories.createCoreController(
             category: true,
           },
         },
+        parentCategory: {
+          populate: {
+            parentCategory: {
+              populate: {
+                parentCategory: {
+                  populate: {
+                    parentCategory: {
+                      populate: {
+                        parentCategory: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
         image: true,
         seo: true,
       };

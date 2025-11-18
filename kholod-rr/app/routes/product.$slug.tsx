@@ -42,10 +42,26 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
     ? marked.parse(product.description)
     : "";
 
+  // Build category hierarchy from bottom to top
+  const buildCategoryHierarchy = () => {
+    const categories = [];
+    let currentCategory = product.category;
+
+    while (currentCategory) {
+      categories.unshift({
+        label: currentCategory.name,
+        href: `/catalog/${currentCategory.slug}`,
+      });
+      currentCategory = currentCategory.parentCategory;
+    }
+
+    return categories;
+  };
+
   const breadcrumbs = [
     { label: "Головна", href: "/" },
     { label: "Каталог", href: "/catalog" },
-    { label: product.category.name, href: `/catalog/${product.category.slug}` },
+    ...buildCategoryHierarchy(),
     { label: product.name },
   ];
 

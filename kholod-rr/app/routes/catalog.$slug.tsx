@@ -25,9 +25,26 @@ export default function CategoryPage() {
   const imageUrl = category.image ? `${strapiUrl}${category.image.url}` : null;
   const products = category.products;
 
+  // Build category hierarchy from bottom to top, excluding current category
+  const buildParentHierarchy = () => {
+    const categories = [];
+    let currentCategory = category.parentCategory;
+
+    while (currentCategory) {
+      categories.unshift({
+        label: currentCategory.name,
+        href: `/catalog/${currentCategory.slug}`,
+      });
+      currentCategory = currentCategory.parentCategory;
+    }
+
+    return categories;
+  };
+
   const breadcrumbs = [
     { label: "Головна", href: "/" },
     { label: "Каталог", href: "/catalog" },
+    ...buildParentHierarchy(),
     { label: category.name },
   ];
 
