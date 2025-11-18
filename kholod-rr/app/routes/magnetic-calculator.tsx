@@ -13,12 +13,15 @@ import {
 import { fetchNavigation } from "~/lib/http";
 import type { Route } from "./+types/calculator";
 import MagnetCalculatorForm from "~/components/calculator/MagnetCalculatorForm";
-import { calculateCurtainPrice, type CalculationResult } from "~/lib/calculateCurtainPrice";
+import {
+  calculateCurtainPrice,
+  type CalculationResult,
+} from "~/lib/calculateCurtainPrice";
 
 export function meta() {
   return [
     { title: "Розрахунок вартості штор" },
-    { name: "description", content: "Калькулятор розрахунку шторів" },
+    { name: "description", content: "Калькулятор розрахунку штор" },
   ];
 }
 
