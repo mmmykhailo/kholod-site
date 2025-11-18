@@ -1,6 +1,8 @@
 import { data } from "react-router";
 import type { Page } from "./types/page";
 import type { MainNavigationItems } from "./types/main-navigation";
+import type { CategoriesResponse, Category } from "./types/category";
+import type { ProductsResponse, Product } from "./types/product";
 import { strapiUrl } from "./urls";
 
 const baseURL = `${strapiUrl}/api`;
@@ -29,4 +31,60 @@ export async function fetchNavigation() {
   const nav: MainNavigationItems = await navResponse.json();
 
   return nav || [];
+}
+
+export async function fetchCategories() {
+  const response = await fetch(
+    `${baseURL}/categories?populate[childrenCategories]=true&populate[image]=true`,
+  );
+
+  if (!response.ok) {
+    throw data({ message: "Categories not found" }, { status: 404 });
+  }
+
+  const categories: CategoriesResponse = await response.json();
+
+  return categories.data;
+}
+
+export async function fetchCategoryBySlug(slug: string) {
+  const response = await fetch(`${baseURL}/categories/slug/${slug}`);
+
+  if (!response.ok) {
+    throw data({ message: "Category not found" }, { status: 404 });
+  }
+
+  const category: Category = await response.json();
+
+  return category;
+}
+
+export async function fetchProducts(categorySlug?: string) {
+  let url = `${baseURL}/products?populate[category]=true&populate[images]=true&locale=all`;
+
+  if (categorySlug) {
+    url += `&filters[category][slug][$eq]=${categorySlug}`;
+  }
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw data({ message: "Products not found" }, { status: 404 });
+  }
+
+  const products: ProductsResponse = await response.json();
+
+  return products.data;
+}
+
+export async function fetchProductBySlug(slug: string) {
+  const response = await fetch(`${baseURL}/products/slug/${slug}`);
+
+  if (!response.ok) {
+    throw data({ message: "Product not found" }, { status: 404 });
+  }
+
+  const product: Product = await response.json();
+
+  return product;
 }
