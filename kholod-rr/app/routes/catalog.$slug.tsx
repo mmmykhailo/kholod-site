@@ -8,6 +8,19 @@ import { Breadcrumbs } from "~/components/breadcrumbs";
 import { strapiUrl } from "~/lib/urls";
 import { useLoaderData } from "react-router";
 
+export function meta({ loaderData }: Route.MetaArgs) {
+  const { category } = loaderData;
+  const title = category.name;
+  const description = category.description || `Category ${category.name}`;
+  const image = category.image ? `${strapiUrl}${category.image.url}` : null;
+
+  return [
+    { title },
+    { name: "description", content: description },
+    ...(image ? [{ property: "og:image", content: image }] : []),
+  ];
+}
+
 export async function loader({ params }: Route.LoaderArgs) {
   const [category, navigation] = await Promise.all([
     fetchCategoryBySlug(params.slug),

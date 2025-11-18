@@ -10,6 +10,24 @@ import { Button } from "~/components/ui/button";
 import { marked } from "marked";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
+export function meta({ loaderData }: Route.MetaArgs) {
+  const { product } = loaderData;
+  const title = product.seo?.metaTitle || product.name;
+  const description =
+    product.seo?.metaDescription || product.description || product.name;
+  const image = product.images?.[0]?.url
+    ? product.images[0].url.startsWith("http")
+      ? product.images[0].url
+      : `${strapiUrl}${product.images[0].url}`
+    : null;
+
+  return [
+    { title },
+    { name: "description", content: description },
+    ...(image ? [{ property: "og:image", content: image }] : []),
+  ];
+}
+
 export async function loader({ params }: Route.LoaderArgs) {
   const [product, navigation] = await Promise.all([
     fetchProductBySlug(params.slug),
@@ -45,7 +63,8 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
   // Build category hierarchy from bottom to top
   const buildCategoryHierarchy = () => {
     const categories = [];
-    let currentCategory = product.category;
+    let currentCategory: typeof product.category | null | undefined =
+      product.category;
 
     while (currentCategory) {
       categories.unshift({
@@ -105,11 +124,10 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
                     <button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
-                        selectedImageIndex === index
-                          ? "border-primary"
-                          : "border-transparent hover:border-muted-foreground"
-                      }`}
+                      className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${selectedImageIndex === index
+                        ? "border-primary"
+                        : "border-transparent hover:border-muted-foreground"
+                        }`}
                     >
                       <img
                         src={thumbUrl}

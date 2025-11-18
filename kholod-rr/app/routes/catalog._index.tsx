@@ -4,6 +4,13 @@ import Container from "~/components/ui/container";
 import { CategoryCard } from "~/components/category-card";
 import { useLoaderData } from "react-router";
 
+export function meta() {
+  return [
+    { title: "Каталог" },
+    { name: "description", content: "Каталог товарів" },
+  ];
+}
+
 export async function loader() {
   const [categories, nav] = await Promise.all([
     fetchTopLevelCategories(),
