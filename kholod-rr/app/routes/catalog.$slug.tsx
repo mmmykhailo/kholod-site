@@ -89,10 +89,10 @@ export default function CategoryPage() {
         {/* Products */}
         <div>
           <h2 className="text-2xl font-bold mb-6">
-            Товари {products.length > 0 && `(${products.length})`}
+            Товари {!!products?.length && `(${products.length})`}
           </h2>
 
-          {products.length === 0 ? (
+          {!products?.length ? (
             <div className="text-center py-12 bg-muted rounded-lg">
               <p className="text-muted-foreground">
                 В цій категорії поки немає товарів
