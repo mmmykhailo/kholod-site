@@ -33,9 +33,9 @@ export async function fetchNavigation() {
   return nav || [];
 }
 
-export async function fetchCategories() {
+export async function fetchTopLevelCategories() {
   const response = await fetch(
-    `${baseURL}/categories?populate[childrenCategories]=true&populate[image]=true`,
+    `${baseURL}/categories?populate[childrenCategories]=true&populate[image]=true&filters[parentCategory][$null]=true`,
   );
 
   if (!response.ok) {
