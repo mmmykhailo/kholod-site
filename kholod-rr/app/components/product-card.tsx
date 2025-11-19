@@ -57,9 +57,6 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.name}
           </Link>
         </CardTitle>
-        <CardDescription className="line-clamp-1">
-          {product.category.name}
-        </CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
         <p className="text-2xl font-bold">{price}</p>
