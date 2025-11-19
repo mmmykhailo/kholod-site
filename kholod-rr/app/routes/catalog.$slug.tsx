@@ -472,15 +472,6 @@ export default function CategoryPage() {
 
         {/* Category Header */}
         <div className="mb-12">
-          {imageUrl && (
-            <div className="relative mb-6 aspect-21/9 overflow-hidden rounded-xl bg-muted">
-              <img
-                src={imageUrl}
-                alt={category.image?.alternativeText || category.name}
-                className="h-full w-full object-cover"
-              />
-            </div>
-          )}
           <h1 className="text-4xl font-bold mb-4">{category.name}</h1>
           {category.description && (
             <p className="text-muted-foreground text-lg max-w-3xl">
