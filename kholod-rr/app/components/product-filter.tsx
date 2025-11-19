@@ -9,6 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
 import { cn } from "~/lib/utils";
 import type { SpecificationFilter } from "~/lib/types/specification";
 
@@ -113,7 +118,6 @@ export function ProductFilter({
   onTextChange,
 }: ProductFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [localValues, setLocalValues] = useState<string[]>(
     activeState.values ?? []
   );
@@ -136,25 +140,6 @@ export function ProductFilter({
   useEffect(() => {
     setLocalMax(activeState.max ?? "");
   }, [activeState.max]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
 
   const handleToggleValue = (value: string) => {
     setLocalValues((previous) => {
@@ -290,37 +275,36 @@ export function ProductFilter({
   };
 
   return (
-    <div className="relative inline-block text-left" ref={containerRef}>
-      <Button
-        variant={isActive ? "secondary" : "outline"}
-        className={cn(
-          "h-9 px-3 font-normal justify-between gap-2 min-w-[120px]",
-          isActive && "border-primary/50 bg-primary/5"
-        )}
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span className="truncate">{filter.label}</span>
-        {isActive && activeState.values?.length ? (
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-            {activeState.values.length}
-          </span>
-        ) : null}
-        <ChevronDown
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant={isActive ? "secondary" : "outline"}
           className={cn(
-            "h-4 w-4 opacity-50 transition-transform",
-            isOpen && "rotate-180"
+            "h-9 px-3 font-normal justify-between gap-2 min-w-[120px]",
+            isActive && "border-primary/50 bg-primary/5"
           )}
-        />
-      </Button>
+        >
+          <span className="truncate">{filter.label}</span>
+          {isActive && activeState.values?.length ? (
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+              {activeState.values.length}
+            </span>
+          ) : null}
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 opacity-50 transition-transform",
+              isOpen && "rotate-180"
+            )}
+          />
+        </Button>
+      </PopoverTrigger>
 
-      {isOpen && (
-        <div className="absolute left-0 top-full z-50 mt-2 w-[280px] rounded-md border bg-popover p-4 shadow-md outline-none animate-in fade-in-0 zoom-in-95">
-          <div className="mb-2 font-medium text-sm">
-            {filter.label} {filter.unit && `(${filter.unit})`}
-          </div>
-          {renderContent()}
+      <PopoverContent className="w-[280px] p-4 mx-4">
+        <div className="mb-2 font-medium text-sm">
+          {filter.label} {filter.unit && `(${filter.unit})`}
         </div>
-      )}
-    </div>
+        {renderContent()}
+      </PopoverContent>
+    </Popover>
   );
 }

@@ -42,8 +42,6 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
   const { product, navigation } = loaderData;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  console.log({product})
-
   const images =
     product.images && product.images.length > 0
       ? product.images
@@ -127,10 +125,11 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
                     <button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${selectedImageIndex === index
-                        ? "border-primary"
-                        : "border-transparent hover:border-muted-foreground"
-                        }`}
+                      className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
+                        selectedImageIndex === index
+                          ? "border-primary"
+                          : "border-transparent hover:border-muted-foreground"
+                      }`}
                     >
                       <img
                         src={thumbUrl}
@@ -211,28 +210,29 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
           </div>
         </div>
 
-        {/* Product Description */}
-        {product.description && (
-          <div className="mt-12">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">Опис товару</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div
-                  className="prose prose-neutral max-w-none dark:prose-invert"
-                  dangerouslySetInnerHTML={{ __html: descriptionHtml }}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+          {product.description && (
+            <div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-2xl">Опис товару</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div
+                    className="prose prose-neutral max-w-none dark:prose-invert"
+                    dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
-        {product.specifications?.length ? (
-          <div className="mt-12">
-            <SpecificationTable specifications={product.specifications} />
-          </div>
-        ) : null}
+          {product.specifications?.length ? (
+            <div>
+              <SpecificationTable specifications={product.specifications} />
+            </div>
+          ) : null}
+        </div>
       </Container>
     </>
   );
