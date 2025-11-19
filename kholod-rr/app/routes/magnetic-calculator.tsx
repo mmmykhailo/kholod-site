@@ -40,7 +40,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
     overlap: parseInt(formData.get("overlap") as string),
     addExtraStrip: formData.get("addExtraStrip") === "true",
     corniceType: formData.get("corniceType") as string,
-    plankId: formData.get("plankId") as string,
+    plankType: formData.get("plankId") as string,
   });
 }
 

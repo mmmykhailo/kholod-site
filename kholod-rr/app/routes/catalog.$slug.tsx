@@ -9,14 +9,7 @@ import { CategoryCard } from "~/components/category-card";
 import { Breadcrumbs } from "~/components/breadcrumbs";
 import { strapiUrl } from "~/lib/urls";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
+import { ProductFilter } from "~/components/product-filter";
 import type { SpecificationFilter } from "~/lib/types/specification";
 import type { Product } from "~/lib/types/product";
 
@@ -37,53 +30,9 @@ type FilterChip = {
   isRange?: boolean;
 };
 
-const getSelectValues = (filter: SpecificationFilter) => {
-  const { options } = filter;
-  if (!options) return [];
-
-  if (Array.isArray(options)) {
-    return options.map((option) => String(option));
-  }
-
-  if (
-    typeof options === "object" &&
-    options !== null &&
-    "values" in options &&
-    Array.isArray((options as { values: unknown[] }).values)
-  ) {
-    return ((options as { values: unknown[] }).values).map((value) =>
-      String(value),
-    );
-  }
-
-  return [];
-};
-
-const getNumberOptionDefaults = (
-  filter: SpecificationFilter,
-): { min?: number; max?: number; step?: number } => {
-  const { options } = filter;
-  if (
-    options &&
-    typeof options === "object" &&
-    options !== null &&
-    !Array.isArray(options) &&
-    !("values" in options)
-  ) {
-    const { min, max, step } = options as {
-      min?: number;
-      max?: number;
-      step?: number;
-    };
-    return { min, max, step };
-  }
-
-  return {};
-};
-
 const parseActiveFilters = (
   filters: SpecificationFilter[],
-  searchParams: URLSearchParams,
+  searchParams: URLSearchParams
 ): ActiveFilterState => {
   const result: ActiveFilterState = {};
 
@@ -123,7 +72,7 @@ const extractNumericValue = (raw: string | undefined): number | undefined => {
 const productMatchesFilters = (
   product: Product,
   filters: SpecificationFilter[],
-  activeFilters: ActiveFilterState,
+  activeFilters: ActiveFilterState
 ) => {
   const specifications = product.specifications ?? [];
 
@@ -141,14 +90,14 @@ const productMatchesFilters = (
         const selectedValues = state.values ?? [];
         if (!selectedValues.length) return true;
         return selectedValues.some(
-          (value) => normalizedSpecValue === value.toLowerCase(),
+          (value) => normalizedSpecValue === value.toLowerCase()
         );
       }
       case "text": {
         const searchValues = state.values ?? [];
         if (!searchValues.length) return true;
         return searchValues.every((value) =>
-          normalizedSpecValue.includes(value.toLowerCase()),
+          normalizedSpecValue.includes(value.toLowerCase())
         );
       }
       case "boolean": {
@@ -200,14 +149,15 @@ export default function CategoryPage() {
   const { category, navigation } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const imageUrl = category.image ? `${strapiUrl}${category.image.url}` : null;
   const filtersConfig = category.specificationFilters ?? [];
   const products = category.products ?? [];
   const totalProductsCount = products.length;
 
+  console.log({ filtersConfig });
+
   const activeFilters = useMemo(
     () => parseActiveFilters(filtersConfig, searchParams),
-    [filtersConfig, searchParams],
+    [filtersConfig, searchParams]
   );
 
   const hasActiveFilters = Object.keys(activeFilters).length > 0;
@@ -218,7 +168,7 @@ export default function CategoryPage() {
     }
 
     return products.filter((product) =>
-      productMatchesFilters(product, filtersConfig, activeFilters),
+      productMatchesFilters(product, filtersConfig, activeFilters)
     );
   }, [products, filtersConfig, activeFilters, hasActiveFilters]);
 
@@ -258,7 +208,7 @@ export default function CategoryPage() {
       mutator(next);
       setSearchParams(next, { replace: true });
     },
-    [searchParams, setSearchParams],
+    [searchParams, setSearchParams]
   );
 
   const toggleMultiValue = (slug: string, value: string) => {
@@ -297,7 +247,11 @@ export default function CategoryPage() {
     });
   };
 
-  const setNumericValue = (slug: string, type: "min" | "max", value: string) => {
+  const setNumericValue = (
+    slug: string,
+    type: "min" | "max",
+    value: string
+  ) => {
     updateSearchParams((params) => {
       const key = `spec.${slug}.${type}`;
       params.delete(key);
@@ -336,109 +290,6 @@ export default function CategoryPage() {
         .filter((key) => key.startsWith("spec."))
         .forEach((key) => params.delete(key));
     });
-  };
-
-  const renderFilterControl = (filter: SpecificationFilter) => {
-    const active = activeFilters[filter.slug];
-
-    switch (filter.type) {
-      case "select": {
-        const values = getSelectValues(filter);
-        if (!values.length) return null;
-
-        return (
-          <div className="space-y-2" key={filter.id ?? filter.slug}>
-            <p className="text-sm font-medium text-foreground">{filter.label}</p>
-            <div className="space-y-1">
-              {values.map((value) => {
-                const isChecked = active?.values?.includes(value);
-                return (
-                  <label
-                    key={value}
-                    className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground"
-                  >
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-input"
-                      checked={!!isChecked}
-                      onChange={() => toggleMultiValue(filter.slug, value)}
-                    />
-                    <span>{value}</span>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-        );
-      }
-      case "boolean": {
-        const current = active?.values?.[0] ?? "";
-        return (
-          <div className="space-y-2" key={filter.id ?? filter.slug}>
-            <p className="text-sm font-medium text-foreground">{filter.label}</p>
-            <Select
-              value={current}
-              onValueChange={(next) => setBooleanValue(filter.slug, next || null)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Обрати" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">Усі</SelectItem>
-                <SelectItem value="true">Так</SelectItem>
-                <SelectItem value="false">Ні</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        );
-      }
-      case "number": {
-        const defaults = getNumberOptionDefaults(filter);
-        return (
-          <div className="space-y-2" key={filter.id ?? filter.slug}>
-            <p className="text-sm font-medium text-foreground">
-              {filter.label}
-              {filter.unit ? <span className="text-muted-foreground"> ({filter.unit})</span> : null}
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                type="number"
-                inputMode="decimal"
-                placeholder={defaults.min != null ? defaults.min.toString() : "Мін"}
-                value={active?.min ?? ""}
-                onChange={(event) => setNumericValue(filter.slug, "min", event.target.value)}
-                min={defaults.min}
-                max={defaults.max}
-                step={defaults.step}
-              />
-              <Input
-                type="number"
-                inputMode="decimal"
-                placeholder={defaults.max != null ? defaults.max.toString() : "Макс"}
-                value={active?.max ?? ""}
-                onChange={(event) => setNumericValue(filter.slug, "max", event.target.value)}
-                min={defaults.min}
-                max={defaults.max}
-                step={defaults.step}
-              />
-            </div>
-          </div>
-        );
-      }
-      case "text":
-      default: {
-        return (
-          <div className="space-y-2" key={filter.id ?? filter.slug}>
-            <p className="text-sm font-medium text-foreground">{filter.label}</p>
-            <Input
-              placeholder="Введіть значення"
-              value={active?.values?.[0] ?? ""}
-              onChange={(event) => setSingleValue(filter.slug, event.target.value)}
-            />
-          </div>
-        );
-      }
-    }
   };
 
   // Build category hierarchy from bottom to top, excluding current category
@@ -481,22 +332,26 @@ export default function CategoryPage() {
         </div>
 
         {/* Filters + Content */}
-        <div className="grid gap-10 lg:grid-cols-[280px,1fr]">
+        <div className="space-y-6">
           {filtersConfig.length > 0 && (
-            <aside className="space-y-6 rounded-xl border bg-card p-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Фільтри</h3>
-                {hasActiveFilters && (
-                  <Button variant="ghost" size="sm" onClick={resetAllFilters}>
-                    Скинути
-                  </Button>
-                )}
-              </div>
-
-              <div className="space-y-5">
-                {filtersConfig.map((filter) => renderFilterControl(filter))}
-              </div>
-            </aside>
+            <div className="flex flex-wrap items-center gap-3">
+              {filtersConfig.map((filter) => (
+                <ProductFilter
+                  key={filter.slug}
+                  filter={filter}
+                  activeState={activeFilters[filter.slug] || {}}
+                  onToggleMulti={toggleMultiValue}
+                  onBooleanChange={setBooleanValue}
+                  onNumericChange={setNumericValue}
+                  onTextChange={setSingleValue}
+                />
+              ))}
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={resetAllFilters}>
+                  Скинути
+                </Button>
+              )}
+            </div>
           )}
 
           <div className="space-y-10">
@@ -507,7 +362,10 @@ export default function CategoryPage() {
                   <h2 className="text-2xl font-bold mb-6">Підкатегорії</h2>
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {category.childrenCategories.map((subCategory) => (
-                      <CategoryCard key={subCategory.id} category={subCategory} />
+                      <CategoryCard
+                        key={subCategory.id}
+                        category={subCategory}
+                      />
                     ))}
                   </div>
                 </div>
