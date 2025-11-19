@@ -399,10 +399,7 @@ export default function CategoryPage() {
             {(!category.childrenCategories || products.length > 0) && (
               <div>
                 <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
-                  <h2 className="text-2xl font-bold">
-                    Товари ({filteredProducts.length}
-                    {hasActiveFilters ? ` / ${totalProductsCount}` : ""})
-                  </h2>
+                  <h2 className="text-2xl font-bold">Товари</h2>
                   {hasActiveFilters && filteredProducts.length === 0 && (
                     <p className="text-sm text-muted-foreground">
                       Немає товарів, що відповідають вибраним фільтрам

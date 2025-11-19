@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -69,6 +69,41 @@ const getNumberOptionDefaults = (
   return {};
 };
 
+const useDebouncedCallback = <Args extends unknown[]>(
+  callback: (...args: Args) => void,
+  delay = 300
+) => {
+  const callbackRef = useRef(callback);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  return useCallback(
+    (...args: Args) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        callbackRef.current(...args);
+        timeoutRef.current = null;
+      }, delay);
+    },
+    [delay]
+  );
+};
+
 export function ProductFilter({
   filter,
   activeState,
@@ -79,6 +114,28 @@ export function ProductFilter({
 }: ProductFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [localValues, setLocalValues] = useState<string[]>(
+    activeState.values ?? []
+  );
+  const [localMin, setLocalMin] = useState(activeState.min ?? "");
+  const [localMax, setLocalMax] = useState(activeState.max ?? "");
+  const debouncedToggleMulti = useDebouncedCallback(onToggleMulti, 300);
+  const debouncedBooleanChange = useDebouncedCallback(onBooleanChange, 300);
+  const debouncedNumericChange = useDebouncedCallback(onNumericChange, 300);
+  const debouncedTextChange = useDebouncedCallback(onTextChange, 300);
+  const activeValuesKey = JSON.stringify(activeState.values ?? []);
+
+  useEffect(() => {
+    setLocalValues(activeState.values ?? []);
+  }, [activeValuesKey]);
+
+  useEffect(() => {
+    setLocalMin(activeState.min ?? "");
+  }, [activeState.min]);
+
+  useEffect(() => {
+    setLocalMax(activeState.max ?? "");
+  }, [activeState.max]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -99,6 +156,39 @@ export function ProductFilter({
     };
   }, [isOpen]);
 
+  const handleToggleValue = (value: string) => {
+    setLocalValues((previous) => {
+      if (previous.includes(value)) {
+        return previous.filter((entry) => entry !== value);
+      }
+
+      return [...previous, value];
+    });
+
+    debouncedToggleMulti(filter.slug, value);
+  };
+
+  const handleBooleanChange = (nextValue: string) => {
+    const normalized = nextValue.trim();
+    setLocalValues(normalized ? [nextValue] : []);
+    debouncedBooleanChange(filter.slug, normalized ? nextValue : null);
+  };
+
+  const handleNumberChange = (type: "min" | "max", value: string) => {
+    if (type === "min") {
+      setLocalMin(value);
+    } else {
+      setLocalMax(value);
+    }
+
+    debouncedNumericChange(filter.slug, type, value);
+  };
+
+  const handleTextChange = (value: string) => {
+    setLocalValues(value ? [value] : []);
+    debouncedTextChange(filter.slug, value);
+  };
+
   const isActive =
     (activeState.values && activeState.values.length > 0) ||
     (activeState.min && activeState.min.length > 0) ||
@@ -116,7 +206,7 @@ export function ProductFilter({
         return (
           <div className="space-y-2">
             {values.map((value) => {
-              const isChecked = activeState.values?.includes(value);
+              const isChecked = localValues.includes(value);
               return (
                 <label
                   key={value}
@@ -126,7 +216,7 @@ export function ProductFilter({
                     type="checkbox"
                     className="h-4 w-4 rounded border-input accent-primary"
                     checked={!!isChecked}
-                    onChange={() => onToggleMulti(filter.slug, value)}
+                    onChange={() => handleToggleValue(value)}
                   />
                   <span>{value}</span>
                 </label>
@@ -136,12 +226,9 @@ export function ProductFilter({
         );
       }
       case "boolean": {
-        const current = activeState.values?.[0] ?? "";
+        const current = localValues[0] ?? " ";
         return (
-          <Select
-            value={current}
-            onValueChange={(next) => onBooleanChange(filter.slug, next || null)}
-          >
+          <Select value={current} onValueChange={handleBooleanChange}>
             <SelectTrigger>
               <SelectValue placeholder="Обрати" />
             </SelectTrigger>
@@ -163,10 +250,8 @@ export function ProductFilter({
                 type="number"
                 inputMode="decimal"
                 placeholder={defaults.min?.toString() ?? "Min"}
-                value={activeState.min ?? ""}
-                onChange={(e) =>
-                  onNumericChange(filter.slug, "min", e.target.value)
-                }
+                value={localMin}
+                onChange={(e) => handleNumberChange("min", e.target.value)}
                 min={defaults.min}
                 max={defaults.max}
                 step={defaults.step}
@@ -180,10 +265,8 @@ export function ProductFilter({
                 type="number"
                 inputMode="decimal"
                 placeholder={defaults.max?.toString() ?? "Max"}
-                value={activeState.max ?? ""}
-                onChange={(e) =>
-                  onNumericChange(filter.slug, "max", e.target.value)
-                }
+                value={localMax}
+                onChange={(e) => handleNumberChange("max", e.target.value)}
                 min={defaults.min}
                 max={defaults.max}
                 step={defaults.step}
@@ -198,8 +281,8 @@ export function ProductFilter({
         return (
           <Input
             placeholder="Value..."
-            value={activeState.values?.[0] ?? ""}
-            onChange={(e) => onTextChange(filter.slug, e.target.value)}
+            value={localValues[0] ?? ""}
+            onChange={(e) => handleTextChange(e.target.value)}
           />
         );
       }
