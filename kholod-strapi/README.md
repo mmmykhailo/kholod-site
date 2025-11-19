@@ -32,11 +32,24 @@ npm run build
 yarn build
 ```
 
+## 🧪 Test catalog seeding
+
+Populate the local database with synthetic categories, products, specifications, specs filters, and placeholder imagery via `@ngneat/falso`:
+
+```bash
+npm run seed:test-catalog
+# or
+yarn seed:test-catalog
+```
+
+The job clears categories/products before inserting new mock data, so only run it against disposable environments.
+
 ## 📡 API Endpoints
 
 ### Categories
 
 **Standard REST API:**
+
 - `GET /api/categories` - Get all categories
 - `GET /api/categories/:id` - Get category by ID
 - `PUT /api/categories/:id` - Update category
@@ -44,10 +57,12 @@ yarn build
 - `POST /api/categories` - Create category
 
 **Custom Endpoints:**
+
 - `GET /api/categories/slug/:slug` - Find category by slug (bypasses locale requirement)
 - `GET /api/categories/path/:path*` - Find category by hierarchical path (e.g., `/api/categories/path/parent/child`)
 
 **Query Parameters:**
+
 - `populate=*` - Populate all relations
 - `populate[childrenCategories]=true` - Populate child categories
 - `populate[products][populate][images]=true` - Populate products with images
@@ -56,6 +71,7 @@ yarn build
 ### Products
 
 **Standard REST API:**
+
 - `GET /api/products` - Get all products
 - `GET /api/products/:id` - Get product by ID
 - `PUT /api/products/:id` - Update product
@@ -63,10 +79,12 @@ yarn build
 - `POST /api/products` - Create product
 
 **Custom Endpoints:**
+
 - `GET /api/products/slug/:slug` - Find product by slug (bypasses locale requirement)
 - `GET /api/products/path/:path*` - Find product by category path and slug (e.g., `/api/products/path/category/subcategory/product-slug`)
 
 **Query Parameters:**
+
 - `populate=*` - Populate all relations
 - `populate[category]=true` - Populate category
 - `populate[images]=true` - Populate images
