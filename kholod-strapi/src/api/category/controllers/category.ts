@@ -17,6 +17,7 @@ export default factories.createCoreController(
           populate: {
             images: true,
             category: true,
+            specifications: true,
           },
         },
         parentCategory: {
@@ -38,6 +39,7 @@ export default factories.createCoreController(
         },
         image: true,
         seo: true,
+        specificationFilters: true,
       };
 
       const category = await strapi.db.query("api::category.category").findOne({
@@ -68,10 +70,12 @@ export default factories.createCoreController(
           populate: {
             images: true,
             category: false,
+            specifications: true,
           },
         },
         image: true,
         seo: true,
+        specificationFilters: true,
       };
 
       for (const slug of segments) {

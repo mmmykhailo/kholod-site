@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_shared_specification_filters",
+  "info": {
+    "displayName": "Specification Filter",
+    "icon": "filter",
+    "description": "Defines how a specification can be filtered within a category"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "string",
+      "required": true
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["text", "number", "select", "boolean"],
+      "default": "text",
+      "required": true
+    },
+    "unit": {
+      "type": "string"
+    },
+    "options": {
+      "type": "json",
+      "description": "Used for select filters (array of values) or numeric ranges"
+    }
+  }
+}

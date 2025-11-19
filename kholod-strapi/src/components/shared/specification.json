@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_shared_specifications",
+  "info": {
+    "displayName": "Specification",
+    "icon": "list",
+    "description": "Single product specification item"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "string",
+      "required": true
+    },
+    "value": {
+      "type": "string",
+      "required": true
+    },
+    "unit": {
+      "type": "string"
+    }
+  }
+}

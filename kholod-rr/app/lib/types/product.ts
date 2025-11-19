@@ -1,5 +1,6 @@
 import type { Image } from "./image";
 import type { Category } from "./category";
+import type { ProductSpecification } from "./specification";
 
 export type Product = {
   id: number;
@@ -13,6 +14,7 @@ export type Product = {
   featured: boolean;
   inStock: boolean;
   sku?: string;
+  specifications?: ProductSpecification[];
   seo?: {
     metaTitle?: string;
     metaDescription?: string;

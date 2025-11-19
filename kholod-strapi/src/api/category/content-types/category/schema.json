@@ -76,6 +76,11 @@
       },
       "component": "shared.seo",
       "repeatable": false
+    },
+    "specificationFilters": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.specification-filter"
     }
   }
 }

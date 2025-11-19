@@ -41,6 +41,41 @@ export interface SharedSeo extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedSpecification extends Struct.ComponentSchema {
+  collectionName: 'components_shared_specifications';
+  info: {
+    description: 'Single product specification item';
+    displayName: 'Specification';
+    icon: 'list';
+  };
+  attributes: {
+    label: Schema.Attribute.String & Schema.Attribute.Required;
+    slug: Schema.Attribute.String & Schema.Attribute.Required;
+    unit: Schema.Attribute.String;
+    value: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface SharedSpecificationFilter extends Struct.ComponentSchema {
+  collectionName: 'components_shared_specification_filters';
+  info: {
+    description: 'Defines how a specification can be filtered within a category';
+    displayName: 'Specification Filter';
+    icon: 'filter';
+  };
+  attributes: {
+    label: Schema.Attribute.String & Schema.Attribute.Required;
+    options: Schema.Attribute.JSON;
+    slug: Schema.Attribute.String & Schema.Attribute.Required;
+    type: Schema.Attribute.Enumeration<
+      ['text', 'number', 'select', 'boolean']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'text'>;
+    unit: Schema.Attribute.String;
+  };
+}
+
 export interface SharedThreeImagesBanner extends Struct.ComponentSchema {
   collectionName: 'components_shared_three_images_banners';
   info: {
@@ -62,6 +97,8 @@ declare module '@strapi/strapi' {
       'shared.image-banner': SharedImageBanner;
       'shared.rich-text': SharedRichText;
       'shared.seo': SharedSeo;
+      'shared.specification': SharedSpecification;
+      'shared.specification-filter': SharedSpecificationFilter;
       'shared.three-images-banner': SharedThreeImagesBanner;
     }
   }

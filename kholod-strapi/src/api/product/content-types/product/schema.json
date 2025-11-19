@@ -81,6 +81,11 @@
       },
       "component": "shared.seo",
       "repeatable": false
+    },
+    "specifications": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.specification"
     }
   }
 }

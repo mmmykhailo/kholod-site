@@ -1,3 +1,5 @@
+import { useCallback, useMemo } from "react";
+import { useLoaderData, useSearchParams } from "react-router";
 import type { Route } from "./+types/catalog.$slug";
 import { fetchCategoryBySlug, fetchNavigation } from "~/lib/http";
 import Header from "~/components/header";
@@ -6,7 +8,171 @@ import { ProductCard } from "~/components/product-card";
 import { CategoryCard } from "~/components/category-card";
 import { Breadcrumbs } from "~/components/breadcrumbs";
 import { strapiUrl } from "~/lib/urls";
-import { useLoaderData } from "react-router";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import type { SpecificationFilter } from "~/lib/types/specification";
+import type { Product } from "~/lib/types/product";
+
+type ActiveFilterState = Record<
+  string,
+  {
+    values?: string[];
+    min?: string;
+    max?: string;
+  }
+>;
+
+type FilterChip = {
+  key: string;
+  slug: string;
+  label: string;
+  value?: string;
+  isRange?: boolean;
+};
+
+const getSelectValues = (filter: SpecificationFilter) => {
+  const { options } = filter;
+  if (!options) return [];
+
+  if (Array.isArray(options)) {
+    return options.map((option) => String(option));
+  }
+
+  if (
+    typeof options === "object" &&
+    options !== null &&
+    "values" in options &&
+    Array.isArray((options as { values: unknown[] }).values)
+  ) {
+    return ((options as { values: unknown[] }).values).map((value) =>
+      String(value),
+    );
+  }
+
+  return [];
+};
+
+const getNumberOptionDefaults = (
+  filter: SpecificationFilter,
+): { min?: number; max?: number; step?: number } => {
+  const { options } = filter;
+  if (
+    options &&
+    typeof options === "object" &&
+    options !== null &&
+    !Array.isArray(options) &&
+    !("values" in options)
+  ) {
+    const { min, max, step } = options as {
+      min?: number;
+      max?: number;
+      step?: number;
+    };
+    return { min, max, step };
+  }
+
+  return {};
+};
+
+const parseActiveFilters = (
+  filters: SpecificationFilter[],
+  searchParams: URLSearchParams,
+): ActiveFilterState => {
+  const result: ActiveFilterState = {};
+
+  filters.forEach(({ slug }) => {
+    const values = searchParams.getAll(`spec.${slug}`);
+    const min = searchParams.get(`spec.${slug}.min`);
+    const max = searchParams.get(`spec.${slug}.max`);
+
+    if (values.length || (min && min.length) || (max && max.length)) {
+      result[slug] = {};
+
+      if (values.length) {
+        result[slug].values = values;
+      }
+
+      if (min) {
+        result[slug].min = min;
+      }
+
+      if (max) {
+        result[slug].max = max;
+      }
+    }
+  });
+
+  return result;
+};
+
+const extractNumericValue = (raw: string | undefined): number | undefined => {
+  if (!raw) return undefined;
+  const normalized = raw.replace(/,/g, ".").match(/-?\d+(?:\.\d+)?/);
+  if (!normalized) return undefined;
+  const parsed = parseFloat(normalized[0]);
+  return Number.isNaN(parsed) ? undefined : parsed;
+};
+
+const productMatchesFilters = (
+  product: Product,
+  filters: SpecificationFilter[],
+  activeFilters: ActiveFilterState,
+) => {
+  const specifications = product.specifications ?? [];
+
+  return Object.entries(activeFilters).every(([slug, state]) => {
+    const filterDefinition = filters.find((filter) => filter.slug === slug);
+    if (!filterDefinition) return true;
+
+    const spec = specifications.find((item) => item.slug === slug);
+    if (!spec) return false;
+
+    const normalizedSpecValue = spec.value?.toLowerCase?.() ?? "";
+
+    switch (filterDefinition.type) {
+      case "select": {
+        const selectedValues = state.values ?? [];
+        if (!selectedValues.length) return true;
+        return selectedValues.some(
+          (value) => normalizedSpecValue === value.toLowerCase(),
+        );
+      }
+      case "text": {
+        const searchValues = state.values ?? [];
+        if (!searchValues.length) return true;
+        return searchValues.every((value) =>
+          normalizedSpecValue.includes(value.toLowerCase()),
+        );
+      }
+      case "boolean": {
+        const selected = state.values?.[0];
+        if (!selected) return true;
+        return normalizedSpecValue === selected.toLowerCase();
+      }
+      case "number": {
+        const min = extractNumericValue(state.min);
+        const max = extractNumericValue(state.max);
+        if (min == null && max == null) return true;
+
+        const specNumber = extractNumericValue(spec.value);
+        if (specNumber == null) return false;
+
+        if (min != null && specNumber < min) return false;
+        if (max != null && specNumber > max) return false;
+        return true;
+      }
+      default:
+        return true;
+    }
+  });
+};
 
 export function meta({ loaderData }: Route.MetaArgs) {
   const { category } = loaderData;
@@ -32,11 +198,248 @@ export async function loader({ params }: Route.LoaderArgs) {
 
 export default function CategoryPage() {
   const { category, navigation } = useLoaderData<typeof loader>();
-
-  console.log({ category });
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const imageUrl = category.image ? `${strapiUrl}${category.image.url}` : null;
-  const products = category.products;
+  const filtersConfig = category.specificationFilters ?? [];
+  const products = category.products ?? [];
+  const totalProductsCount = products.length;
+
+  const activeFilters = useMemo(
+    () => parseActiveFilters(filtersConfig, searchParams),
+    [filtersConfig, searchParams],
+  );
+
+  const hasActiveFilters = Object.keys(activeFilters).length > 0;
+
+  const filteredProducts = useMemo(() => {
+    if (!hasActiveFilters) {
+      return products;
+    }
+
+    return products.filter((product) =>
+      productMatchesFilters(product, filtersConfig, activeFilters),
+    );
+  }, [products, filtersConfig, activeFilters, hasActiveFilters]);
+
+  const filterChips = useMemo<FilterChip[]>(() => {
+    return Object.entries(activeFilters).flatMap(([slug, state]) => {
+      const chips: FilterChip[] = [];
+      const definition = filtersConfig.find((filter) => filter.slug === slug);
+      const label = definition?.label ?? slug;
+
+      state.values?.forEach((value) => {
+        chips.push({
+          key: `${slug}-${value}`,
+          slug,
+          label: `${label}: ${value}`,
+          value,
+        });
+      });
+
+      if ((state.min && state.min.length) || (state.max && state.max.length)) {
+        const unitSuffix = definition?.unit ? ` ${definition.unit}` : "";
+        const rangeLabel = `${label}: ${state.min ?? "…"} – ${state.max ?? "…"}${unitSuffix}`;
+        chips.push({
+          key: `${slug}-range`,
+          slug,
+          label: rangeLabel,
+          isRange: true,
+        });
+      }
+
+      return chips;
+    });
+  }, [activeFilters, filtersConfig]);
+
+  const updateSearchParams = useCallback(
+    (mutator: (params: URLSearchParams) => void) => {
+      const next = new URLSearchParams(searchParams);
+      mutator(next);
+      setSearchParams(next, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
+
+  const toggleMultiValue = (slug: string, value: string) => {
+    updateSearchParams((params) => {
+      const key = `spec.${slug}`;
+      const current = new Set(params.getAll(key));
+      if (current.has(value)) {
+        current.delete(value);
+      } else {
+        current.add(value);
+      }
+
+      params.delete(key);
+      current.forEach((entry) => params.append(key, entry));
+    });
+  };
+
+  const setSingleValue = (slug: string, value: string) => {
+    updateSearchParams((params) => {
+      const key = `spec.${slug}`;
+      params.delete(key);
+      const trimmed = value.trim();
+      if (trimmed) {
+        params.append(key, trimmed);
+      }
+    });
+  };
+
+  const setBooleanValue = (slug: string, value: string | null) => {
+    updateSearchParams((params) => {
+      const key = `spec.${slug}`;
+      params.delete(key);
+      if (value) {
+        params.append(key, value);
+      }
+    });
+  };
+
+  const setNumericValue = (slug: string, type: "min" | "max", value: string) => {
+    updateSearchParams((params) => {
+      const key = `spec.${slug}.${type}`;
+      params.delete(key);
+      const trimmed = value.trim();
+      if (trimmed) {
+        params.set(key, trimmed);
+      }
+    });
+  };
+
+  const removeFilter = (chip: FilterChip) => {
+    updateSearchParams((params) => {
+      if (chip.isRange) {
+        params.delete(`spec.${chip.slug}.min`);
+        params.delete(`spec.${chip.slug}.max`);
+        return;
+      }
+
+      const key = `spec.${chip.slug}`;
+      if (!chip.value) {
+        params.delete(key);
+        return;
+      }
+
+      const remaining = params
+        .getAll(key)
+        .filter((value) => value !== chip.value);
+      params.delete(key);
+      remaining.forEach((value) => params.append(key, value));
+    });
+  };
+
+  const resetAllFilters = () => {
+    updateSearchParams((params) => {
+      [...params.keys()] // spread to avoid mutation issues while iterating
+        .filter((key) => key.startsWith("spec."))
+        .forEach((key) => params.delete(key));
+    });
+  };
+
+  const renderFilterControl = (filter: SpecificationFilter) => {
+    const active = activeFilters[filter.slug];
+
+    switch (filter.type) {
+      case "select": {
+        const values = getSelectValues(filter);
+        if (!values.length) return null;
+
+        return (
+          <div className="space-y-2" key={filter.id ?? filter.slug}>
+            <p className="text-sm font-medium text-foreground">{filter.label}</p>
+            <div className="space-y-1">
+              {values.map((value) => {
+                const isChecked = active?.values?.includes(value);
+                return (
+                  <label
+                    key={value}
+                    className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground"
+                  >
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-input"
+                      checked={!!isChecked}
+                      onChange={() => toggleMultiValue(filter.slug, value)}
+                    />
+                    <span>{value}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        );
+      }
+      case "boolean": {
+        const current = active?.values?.[0] ?? "";
+        return (
+          <div className="space-y-2" key={filter.id ?? filter.slug}>
+            <p className="text-sm font-medium text-foreground">{filter.label}</p>
+            <Select
+              value={current}
+              onValueChange={(next) => setBooleanValue(filter.slug, next || null)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Обрати" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Усі</SelectItem>
+                <SelectItem value="true">Так</SelectItem>
+                <SelectItem value="false">Ні</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        );
+      }
+      case "number": {
+        const defaults = getNumberOptionDefaults(filter);
+        return (
+          <div className="space-y-2" key={filter.id ?? filter.slug}>
+            <p className="text-sm font-medium text-foreground">
+              {filter.label}
+              {filter.unit ? <span className="text-muted-foreground"> ({filter.unit})</span> : null}
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                type="number"
+                inputMode="decimal"
+                placeholder={defaults.min != null ? defaults.min.toString() : "Мін"}
+                value={active?.min ?? ""}
+                onChange={(event) => setNumericValue(filter.slug, "min", event.target.value)}
+                min={defaults.min}
+                max={defaults.max}
+                step={defaults.step}
+              />
+              <Input
+                type="number"
+                inputMode="decimal"
+                placeholder={defaults.max != null ? defaults.max.toString() : "Макс"}
+                value={active?.max ?? ""}
+                onChange={(event) => setNumericValue(filter.slug, "max", event.target.value)}
+                min={defaults.min}
+                max={defaults.max}
+                step={defaults.step}
+              />
+            </div>
+          </div>
+        );
+      }
+      case "text":
+      default: {
+        return (
+          <div className="space-y-2" key={filter.id ?? filter.slug}>
+            <p className="text-sm font-medium text-foreground">{filter.label}</p>
+            <Input
+              placeholder="Введіть значення"
+              value={active?.values?.[0] ?? ""}
+              onChange={(event) => setSingleValue(filter.slug, event.target.value)}
+            />
+          </div>
+        );
+      }
+    }
+  };
 
   // Build category hierarchy from bottom to top, excluding current category
   const buildParentHierarchy = () => {
@@ -86,41 +489,97 @@ export default function CategoryPage() {
           )}
         </div>
 
-        {/* Subcategories */}
-        {category.childrenCategories &&
-          category.childrenCategories.length > 0 && (
-            <div className="mb-12">
-              <h2 className="text-2xl font-bold mb-6">Підкатегорії</h2>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {category.childrenCategories.map((subCategory) => (
-                  <CategoryCard key={subCategory.id} category={subCategory} />
-                ))}
+        {/* Filters + Content */}
+        <div className="grid gap-10 lg:grid-cols-[280px,1fr]">
+          {filtersConfig.length > 0 && (
+            <aside className="space-y-6 rounded-xl border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Фільтри</h3>
+                {hasActiveFilters && (
+                  <Button variant="ghost" size="sm" onClick={resetAllFilters}>
+                    Скинути
+                  </Button>
+                )}
               </div>
-            </div>
+
+              <div className="space-y-5">
+                {filtersConfig.map((filter) => renderFilterControl(filter))}
+              </div>
+            </aside>
           )}
 
-        {/* Products */}
-        {(!category.childrenCategories || !!products?.length) && (
-          <div>
-            <h2 className="text-2xl font-bold mb-6">
-              Товари {!!products?.length && `(${products.length})`}
-            </h2>
+          <div className="space-y-10">
+            {/* Subcategories */}
+            {category.childrenCategories &&
+              category.childrenCategories.length > 0 && (
+                <div className="mb-2">
+                  <h2 className="text-2xl font-bold mb-6">Підкатегорії</h2>
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {category.childrenCategories.map((subCategory) => (
+                      <CategoryCard key={subCategory.id} category={subCategory} />
+                    ))}
+                  </div>
+                </div>
+              )}
 
-            {!products?.length ? (
-              <div className="text-center py-12 bg-muted rounded-lg">
-                <p className="text-muted-foreground">
-                  В цій категорії поки немає товарів
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+            {/* Active filter chips */}
+            {filterChips.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {filterChips.map((chip) => (
+                  <button
+                    key={chip.key}
+                    type="button"
+                    onClick={() => removeFilter(chip)}
+                    className="rounded-full border border-border bg-muted px-3 py-1 text-sm text-muted-foreground transition hover:border-primary hover:text-primary"
+                  >
+                    {chip.label}
+                    <span className="ml-2 text-xs">✕</span>
+                  </button>
                 ))}
+                <button
+                  type="button"
+                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                  onClick={resetAllFilters}
+                >
+                  Очистити все
+                </button>
+              </div>
+            )}
+
+            {/* Products */}
+            {(!category.childrenCategories || products.length > 0) && (
+              <div>
+                <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
+                  <h2 className="text-2xl font-bold">
+                    Товари ({filteredProducts.length}
+                    {hasActiveFilters ? ` / ${totalProductsCount}` : ""})
+                  </h2>
+                  {hasActiveFilters && filteredProducts.length === 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      Немає товарів, що відповідають вибраним фільтрам
+                    </p>
+                  )}
+                </div>
+
+                {!filteredProducts.length ? (
+                  <div className="text-center py-12 bg-muted rounded-lg">
+                    <p className="text-muted-foreground">
+                      {hasActiveFilters
+                        ? "Змініть значення фільтрів, щоб побачити товари"
+                        : "В цій категорії поки немає товарів"}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {filteredProducts.map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
+        </div>
       </Container>
     </>
   );

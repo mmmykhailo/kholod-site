@@ -9,6 +9,7 @@ import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { marked } from "marked";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { SpecificationTable } from "~/components/specification-table";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   const { product } = loaderData;
@@ -40,6 +41,8 @@ export async function loader({ params }: Route.LoaderArgs) {
 export default function ProductPage({ loaderData }: Route.ComponentProps) {
   const { product, navigation } = loaderData;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  console.log({product})
 
   const images =
     product.images && product.images.length > 0
@@ -224,6 +227,12 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
             </Card>
           </div>
         )}
+
+        {product.specifications?.length ? (
+          <div className="mt-12">
+            <SpecificationTable specifications={product.specifications} />
+          </div>
+        ) : null}
       </Container>
     </>
   );

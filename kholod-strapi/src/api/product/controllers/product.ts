@@ -34,6 +34,7 @@ export default factories.createCoreController(
             },
           },
           seo: true,
+          specifications: true,
         },
       });
 
@@ -99,6 +100,7 @@ export default factories.createCoreController(
             },
           },
           seo: true,
+          specifications: true,
         },
       });
 

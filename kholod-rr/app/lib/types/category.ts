@@ -1,5 +1,6 @@
 import type { Image } from "./image";
 import type { Product } from "./product";
+import type { SpecificationFilter } from "./specification";
 
 export type Category = {
   id: number;
@@ -16,6 +17,7 @@ export type Category = {
     metaDescription?: string;
     keywords?: string;
   };
+  specificationFilters?: SpecificationFilter[];
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
