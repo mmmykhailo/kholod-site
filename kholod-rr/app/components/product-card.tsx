@@ -67,7 +67,12 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
       </CardContent>
       <CardFooter>
-        <Button asChild className="w-full" disabled={!product.inStock}>
+        <Button
+          asChild
+          size="lg"
+          className="w-full"
+          disabled={!product.inStock}
+        >
           <Link to={`/product/${product.slug}`}>
             {product.inStock ? "Детальніше" : "Немає в наявності"}
           </Link>

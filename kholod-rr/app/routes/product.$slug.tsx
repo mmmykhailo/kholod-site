@@ -172,14 +172,17 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
               </p>
             </div>
 
-            <div className="space-y-3">
-              <Button size="lg" className="w-full" disabled={!product.inStock}>
-                {product.inStock ? "Замовити" : "Немає в наявності"}
-              </Button>
-              <p className="text-sm text-muted-foreground text-center">
-                Зв'яжіться з нами для оформлення замовлення
-              </p>
-            </div>
+            {product.inStock && (
+              <div>
+                <Button
+                  size="2xl"
+                  className="w-full"
+                  disabled={!product.inStock}
+                >
+                  Замовити
+                </Button>
+              </div>
+            )}
 
             <Card>
               <CardHeader>
