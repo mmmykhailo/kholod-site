@@ -7,6 +7,21 @@ import { strapiUrl } from "./urls";
 
 const baseURL = `${strapiUrl}/api`;
 
+type GeneralSiteInfo = {
+  id: number;
+  documentId: string;
+  contactPhoneNumbers: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string | null;
+  locale: string;
+};
+
+type GeneralSiteInfoResponse = {
+  data: GeneralSiteInfo;
+  meta: unknown;
+};
+
 export async function fetchPage(splat: string | undefined) {
   const pageResponse = await fetch(
     `${baseURL}/pages/${splat || "home"}?populate[blocks][*]=true`,
@@ -31,6 +46,18 @@ export async function fetchNavigation() {
   const nav: MainNavigationItems = await navResponse.json();
 
   return nav || [];
+}
+
+export async function fetchGeneralSiteInfo() {
+  const response = await fetch(`${baseURL}/general-site-info`);
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const json: GeneralSiteInfoResponse = await response.json();
+
+  return json.data;
 }
 
 export async function fetchTopLevelCategories() {

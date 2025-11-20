@@ -1,6 +1,4 @@
-import type { LoaderFunctionArgs } from "react-router";
-import { useActionData, useLoaderData } from "react-router";
-import Header from "~/components/header";
+import { useActionData } from "react-router";
 import Container from "~/components/ui/container";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
@@ -10,9 +8,8 @@ import {
   ItemSeparator,
   ItemTitle,
 } from "~/components/ui/item";
-import { fetchNavigation } from "~/lib/http";
 import type { Route } from "./+types/calculator";
-import RegularCalculatorForm from "~/components/calculator/RegularCalculatorForm";
+import MagnetCalculatorForm from "~/components/calculator/MagnetCalculatorForm";
 import {
   calculateCurtainPrice,
   type CalculationResult,
@@ -25,11 +22,6 @@ export function meta() {
   ];
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
-  const nav = await fetchNavigation();
-  return { nav };
-}
-
 export async function clientAction({ request }: Route.ClientActionArgs) {
   const formData = await request.formData();
 
@@ -40,19 +32,19 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
     overlap: parseInt(formData.get("overlap") as string),
     addExtraStrip: formData.get("addExtraStrip") === "true",
     corniceType: formData.get("corniceType") as string,
-    plankType: formData.get("plankType") as string,
+    plankType: formData.get("plankId") as string,
   });
 }
 
 export default function Calculator() {
-  const { nav } = useLoaderData<typeof loader>();
   const result = useActionData<CalculationResult>();
 
   return (
     <div className="min-h-screen pb-16">
-      <Header navigationItems={nav} />
       <Container className="mt-8">
-        <h1 className="text-4xl font-bold mb-8">Розрахунок вартості штор</h1>
+        <h1 className="text-4xl font-bold mb-8">
+          Розрахунок вартості магнітних штор
+        </h1>
 
         <div className="grid gap-8 lg:grid-cols-2">
           <div>
@@ -61,7 +53,7 @@ export default function Calculator() {
                 <CardTitle>Параметри розрахунку</CardTitle>
               </CardHeader>
               <CardContent>
-                <RegularCalculatorForm />
+                <MagnetCalculatorForm />
               </CardContent>
             </Card>
           </div>

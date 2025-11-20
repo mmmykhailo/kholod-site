@@ -31,7 +31,7 @@ function NestedNavigationItem({
     {
       "text-lg font-medium": level === 0,
       "text-base": level > 0,
-    },
+    }
   );
 
   if (hasChildren) {
@@ -70,17 +70,41 @@ type HeaderProps = {
   navigationItems: MainNavigationItems;
 };
 
-export default function Header({ navigationItems }: HeaderProps) {
+export default function Header({
+  navigationItems,
+  phoneNumbers,
+}: HeaderProps & { phoneNumbers?: string[] }) {
+  const cleanPhoneNumbers = (phoneNumbers ?? [])
+    .map((number) => number.trim())
+    .filter((number) => number.length > 0);
+
+  const formatTelHref = (number: string) =>
+    "tel:" + number.replace(/[^\d+]/g, "");
+
   return (
     <div>
       <div className="border-b">
         <div className="container mx-auto flex justify-end items-center gap-6 px-4 py-2">
-          <a href="tel:+380504000817" className="font-medium">
-            +38(050)400-08-17
-          </a>
-          <a href="tel:+380673889948" className="font-medium">
-            +38(067)388-99-48
-          </a>
+          {cleanPhoneNumbers.length > 0 ? (
+            cleanPhoneNumbers.map((number) => (
+              <a
+                key={number}
+                href={formatTelHref(number)}
+                className="font-medium"
+              >
+                {number}
+              </a>
+            ))
+          ) : (
+            <>
+              <a href="tel:+380504000817" className="font-medium">
+                +38(050)400-08-17
+              </a>
+              <a href="tel:+380673889948" className="font-medium">
+                +38(067)388-99-48
+              </a>
+            </>
+          )}
         </div>
       </div>
       <div className="border-b">

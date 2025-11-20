@@ -1,8 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useLoaderData, useSearchParams } from "react-router";
 import type { Route } from "./+types/catalog.$slug";
-import { fetchCategoryBySlug, fetchNavigation } from "~/lib/http";
-import Header from "~/components/header";
+import { fetchCategoryBySlug } from "~/lib/http";
 import Container from "~/components/ui/container";
 import { ProductCard } from "~/components/product-card";
 import { CategoryCard } from "~/components/category-card";
@@ -137,16 +136,13 @@ export function meta({ loaderData }: Route.MetaArgs) {
 }
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const [category, navigation] = await Promise.all([
-    fetchCategoryBySlug(params.slug),
-    fetchNavigation(),
-  ]);
+  const category = await fetchCategoryBySlug(params.slug);
 
-  return { category, navigation };
+  return { category };
 }
 
 export default function CategoryPage() {
-  const { category, navigation } = useLoaderData<typeof loader>();
+  const { category } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filtersConfig = category.specificationFilters ?? [];
@@ -316,117 +312,111 @@ export default function CategoryPage() {
   ];
 
   return (
-    <>
-      <Header navigationItems={navigation} />
-      <Container className="py-12">
-        <Breadcrumbs items={breadcrumbs} className="mb-6" />
+    <Container className="py-12">
+      <Breadcrumbs items={breadcrumbs} className="mb-6" />
 
-        {/* Category Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-4">{category.name}</h1>
-          {category.description && (
-            <p className="text-muted-foreground text-lg max-w-3xl">
-              {category.description}
-            </p>
-          )}
-        </div>
+      {/* Category Header */}
+      <div className="mb-12">
+        <h1 className="text-4xl font-bold mb-4">{category.name}</h1>
+        {category.description && (
+          <p className="text-muted-foreground text-lg max-w-3xl">
+            {category.description}
+          </p>
+        )}
+      </div>
 
-        {/* Filters + Content */}
-        <div className="space-y-6">
-          {filtersConfig.length > 0 && (
-            <div className="flex flex-wrap items-center gap-3">
-              {filtersConfig.map((filter) => (
-                <ProductFilter
-                  key={filter.slug}
-                  filter={filter}
-                  activeState={activeFilters[filter.slug] || {}}
-                  onToggleMulti={toggleMultiValue}
-                  onBooleanChange={setBooleanValue}
-                  onNumericChange={setNumericValue}
-                  onTextChange={setSingleValue}
-                />
+      {/* Filters + Content */}
+      <div className="space-y-6">
+        {filtersConfig.length > 0 && (
+          <div className="flex flex-wrap items-center gap-3">
+            {filtersConfig.map((filter) => (
+              <ProductFilter
+                key={filter.slug}
+                filter={filter}
+                activeState={activeFilters[filter.slug] || {}}
+                onToggleMulti={toggleMultiValue}
+                onBooleanChange={setBooleanValue}
+                onNumericChange={setNumericValue}
+                onTextChange={setSingleValue}
+              />
+            ))}
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={resetAllFilters}>
+                Скинути
+              </Button>
+            )}
+          </div>
+        )}
+
+        <div className="space-y-10">
+          {/* Subcategories */}
+          {category.childrenCategories &&
+            category.childrenCategories.length > 0 && (
+              <div className="mb-2">
+                <h2 className="text-2xl font-bold mb-6">Підкатегорії</h2>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {category.childrenCategories.map((subCategory) => (
+                    <CategoryCard key={subCategory.id} category={subCategory} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+          {/* Active filter chips */}
+          {filterChips.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {filterChips.map((chip) => (
+                <button
+                  key={chip.key}
+                  type="button"
+                  onClick={() => removeFilter(chip)}
+                  className="rounded-full border border-border bg-muted px-3 py-1 text-sm text-muted-foreground transition hover:border-primary hover:text-primary"
+                >
+                  {chip.label}
+                  <span className="ml-2 text-xs">✕</span>
+                </button>
               ))}
-              {hasActiveFilters && (
-                <Button variant="ghost" size="sm" onClick={resetAllFilters}>
-                  Скинути
-                </Button>
-              )}
+              <button
+                type="button"
+                className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                onClick={resetAllFilters}
+              >
+                Очистити все
+              </button>
             </div>
           )}
 
-          <div className="space-y-10">
-            {/* Subcategories */}
-            {category.childrenCategories &&
-              category.childrenCategories.length > 0 && (
-                <div className="mb-2">
-                  <h2 className="text-2xl font-bold mb-6">Підкатегорії</h2>
-                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {category.childrenCategories.map((subCategory) => (
-                      <CategoryCard
-                        key={subCategory.id}
-                        category={subCategory}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-            {/* Active filter chips */}
-            {filterChips.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {filterChips.map((chip) => (
-                  <button
-                    key={chip.key}
-                    type="button"
-                    onClick={() => removeFilter(chip)}
-                    className="rounded-full border border-border bg-muted px-3 py-1 text-sm text-muted-foreground transition hover:border-primary hover:text-primary"
-                  >
-                    {chip.label}
-                    <span className="ml-2 text-xs">✕</span>
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-                  onClick={resetAllFilters}
-                >
-                  Очистити все
-                </button>
-              </div>
-            )}
-
-            {/* Products */}
-            {(!category.childrenCategories || products.length > 0) && (
-              <div>
-                <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
-                  <h2 className="text-2xl font-bold">Товари</h2>
-                  {hasActiveFilters && filteredProducts.length === 0 && (
-                    <p className="text-sm text-muted-foreground">
-                      Немає товарів, що відповідають вибраним фільтрам
-                    </p>
-                  )}
-                </div>
-
-                {!filteredProducts.length ? (
-                  <div className="text-center py-12 bg-muted rounded-lg">
-                    <p className="text-muted-foreground">
-                      {hasActiveFilters
-                        ? "Змініть значення фільтрів, щоб побачити товари"
-                        : "В цій категорії поки немає товарів"}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {filteredProducts.map((product) => (
-                      <ProductCard key={product.id} product={product} />
-                    ))}
-                  </div>
+          {/* Products */}
+          {(!category.childrenCategories || products.length > 0) && (
+            <div>
+              <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
+                <h2 className="text-2xl font-bold">Товари</h2>
+                {hasActiveFilters && filteredProducts.length === 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    Немає товарів, що відповідають вибраним фільтрам
+                  </p>
                 )}
               </div>
-            )}
-          </div>
+
+              {!filteredProducts.length ? (
+                <div className="text-center py-12 bg-muted rounded-lg">
+                  <p className="text-muted-foreground">
+                    {hasActiveFilters
+                      ? "Змініть значення фільтрів, щоб побачити товари"
+                      : "В цій категорії поки немає товарів"}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {filteredProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      </Container>
-    </>
+      </div>
+    </Container>
   );
 }

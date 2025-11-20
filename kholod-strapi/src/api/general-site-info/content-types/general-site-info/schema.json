@@ -1,0 +1,27 @@
+{
+  "kind": "singleType",
+  "collectionName": "general_site_infos",
+  "info": {
+    "singularName": "general-site-info",
+    "pluralName": "general-site-infos",
+    "displayName": "General site info"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "contactPhoneNumbers": {
+      "type": "text",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    }
+  }
+}
