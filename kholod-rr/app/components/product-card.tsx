@@ -1,6 +1,8 @@
 import { Link } from "react-router";
 import type { Product } from "~/lib/types/product";
 import { strapiUrl } from "~/lib/urls";
+import { useLanguage } from "~/lib/language-context";
+import { buildLocalizedPath } from "~/lib/i18n";
 import {
   Card,
   CardContent,
@@ -16,6 +18,7 @@ type ProductCardProps = {
 };
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { language } = useLanguage();
   const imageUrl = product.images?.[0]
     ? `${strapiUrl}${product.images[0].url}`
     : "/placeholder-product.png";
@@ -25,9 +28,11 @@ export function ProductCard({ product }: ProductCardProps) {
     currency: "UAH",
   }).format(product.price);
 
+  const productPath = buildLocalizedPath(language, `/product/${product.slug}`);
+
   return (
     <Card className="flex flex-col overflow-hidden transition-shadow hover:shadow-lg">
-      <Link to={`/product/${product.slug}`} className="block">
+      <Link to={productPath} className="block">
         <div className="relative aspect-square overflow-hidden bg-muted">
           <img
             src={imageUrl}
@@ -51,7 +56,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <CardHeader>
         <CardTitle className="line-clamp-2">
           <Link
-            to={`/product/${product.slug}`}
+            to={productPath}
             className="hover:text-primary transition-colors"
           >
             {product.name}
@@ -73,7 +78,7 @@ export function ProductCard({ product }: ProductCardProps) {
           className="w-full"
           disabled={!product.inStock}
         >
-          <Link to={`/product/${product.slug}`}>
+          <Link to={productPath}>
             {product.inStock ? "Детальніше" : "Немає в наявності"}
           </Link>
         </Button>

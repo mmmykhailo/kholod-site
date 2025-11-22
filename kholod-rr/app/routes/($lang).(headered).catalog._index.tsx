@@ -2,6 +2,7 @@ import { fetchTopLevelCategories } from "~/lib/http";
 import Container from "~/components/ui/container";
 import { CategoryCard } from "~/components/category-card";
 import { useLoaderData } from "react-router";
+import { getLanguageFromRequest } from "~/lib/i18n";
 
 export function meta() {
   return [
@@ -10,8 +11,10 @@ export function meta() {
   ];
 }
 
-export async function loader() {
-  const categories = await fetchTopLevelCategories();
+export async function loader({ request }: { request: Request }) {
+  const language = getLanguageFromRequest(request);
+
+  const categories = await fetchTopLevelCategories(language);
 
   return { categories };
 }

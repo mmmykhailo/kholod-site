@@ -1,9 +1,10 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import BlockRenderer from "~/components/blocks/block-renderer";
-import type { Route } from "./+types/$";
+import type { Route } from "./+types/($lang).(headered).$";
 import type { Page } from "~/lib/types/page";
 import { fetchPage } from "~/lib/http";
+import { getLanguageFromRequest } from "~/lib/i18n";
 import Container from "~/components/ui/container";
 
 export function meta({ loaderData }: Route.MetaArgs) {
@@ -14,10 +15,11 @@ export function meta({ loaderData }: Route.MetaArgs) {
   return [{ title: page.title }, { name: "description", content: page.title }];
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const splat = params["*"];
+  const language = getLanguageFromRequest(request);
 
-  const page = await fetchPage(splat);
+  const page = await fetchPage(splat, language);
 
   return { page };
 }

@@ -8,7 +8,7 @@ import {
   ItemSeparator,
   ItemTitle,
 } from "~/components/ui/item";
-import type { Route } from "./+types/(headered).calculator";
+import type { Route } from "./+types/($lang).(headered).calculator";
 import RegularCalculatorForm from "~/components/calculator/RegularCalculatorForm";
 import {
   calculateCurtainPrice,

@@ -3,6 +3,7 @@ import type { Page } from "./types/page";
 import type { MainNavigationItems } from "./types/main-navigation";
 import type { CategoriesResponse, Category } from "./types/category";
 import type { ProductsResponse, Product } from "./types/product";
+import type { Language } from "./i18n";
 import { strapiUrl } from "./urls";
 
 const baseURL = `${strapiUrl}/api`;
@@ -22,12 +23,15 @@ type GeneralSiteInfoResponse = {
   meta: unknown;
 };
 
-export async function fetchPage(splat: string | undefined) {
-  const pageResponse = await fetch(
-    `${baseURL}/pages/${splat || "home"}?populate[blocks][*]=true`,
-  );
+export async function fetchPage(splat: string | undefined, language?: Language) {
+  const url = new URL(`${baseURL}/pages/${splat || "home"}`);
+  url.searchParams.set("populate[blocks][*]", "true");
+  if (language) {
+    url.searchParams.set("locale", language);
+  }
 
-  console.log(`${baseURL}/pages/${splat || "home"}?populate[blocks][*]=true`);
+  console.log({language})
+  const pageResponse = await fetch(url.toString());
 
   if (!pageResponse.ok) {
     throw data({ message: "Page not found" }, { status: 404 });
@@ -38,18 +42,29 @@ export async function fetchPage(splat: string | undefined) {
   return page;
 }
 
-export async function fetchNavigation() {
-  const navResponse = await fetch(
-    `${baseURL}/navigation/render/agxhqhpkugvgtalcztlckvzm?type=TREE`,
+export async function fetchNavigation(language?: Language) {
+  const url = new URL(
+    `${baseURL}/navigation/render/agxhqhpkugvgtalcztlckvzm`,
   );
+  url.searchParams.set("type", "TREE");
+  if (language) {
+    url.searchParams.set("locale", language);
+  }
+
+  const navResponse = await fetch(url.toString());
 
   const nav: MainNavigationItems = await navResponse.json();
 
   return nav || [];
 }
 
-export async function fetchGeneralSiteInfo() {
-  const response = await fetch(`${baseURL}/general-site-info`);
+export async function fetchGeneralSiteInfo(language?: Language) {
+  const url = new URL(`${baseURL}/general-site-info`);
+  if (language) {
+    url.searchParams.set("locale", language);
+  }
+
+  const response = await fetch(url.toString());
 
   if (!response.ok) {
     return null;
@@ -60,10 +75,16 @@ export async function fetchGeneralSiteInfo() {
   return json.data;
 }
 
-export async function fetchTopLevelCategories() {
-  const response = await fetch(
-    `${baseURL}/categories?populate[childrenCategories]=true&populate[image]=true&filters[parentCategory][$null]=true`,
-  );
+export async function fetchTopLevelCategories(language?: Language) {
+  const url = new URL(`${baseURL}/categories`);
+  url.searchParams.set("populate[childrenCategories]", "true");
+  url.searchParams.set("populate[image]", "true");
+  url.searchParams.set("filters[parentCategory][$null]", "true");
+  if (language) {
+    url.searchParams.set("locale", language);
+  }
+
+  const response = await fetch(url.toString());
 
   if (!response.ok) {
     throw data({ message: "Categories not found" }, { status: 404 });
@@ -74,8 +95,13 @@ export async function fetchTopLevelCategories() {
   return categories.data;
 }
 
-export async function fetchCategoryBySlug(slug: string) {
-  const response = await fetch(`${baseURL}/categories/slug/${slug}`);
+export async function fetchCategoryBySlug(slug: string, language?: Language) {
+  const url = new URL(`${baseURL}/categories/slug/${slug}`);
+  if (language) {
+    url.searchParams.set("locale", language);
+  }
+
+  const response = await fetch(url.toString());
 
   if (!response.ok) {
     throw data({ message: "Category not found" }, { status: 404 });
@@ -86,14 +112,21 @@ export async function fetchCategoryBySlug(slug: string) {
   return category;
 }
 
-export async function fetchProducts(categorySlug?: string) {
-  let url = `${baseURL}/products?populate[category]=true&populate[images]=true&locale=all`;
-
-  if (categorySlug) {
-    url += `&filters[category][slug][$eq]=${categorySlug}`;
+export async function fetchProducts(categorySlug?: string, language?: Language) {
+  const url = new URL(`${baseURL}/products`);
+  url.searchParams.set("populate[category]", "true");
+  url.searchParams.set("populate[images]", "true");
+  if (language) {
+    url.searchParams.set("locale", language);
+  } else {
+    url.searchParams.set("locale", "all");
   }
 
-  const response = await fetch(url);
+  if (categorySlug) {
+    url.searchParams.set("filters[category][slug][$eq]", categorySlug);
+  }
+
+  const response = await fetch(url.toString());
 
   if (!response.ok) {
     throw data({ message: "Products not found" }, { status: 404 });
@@ -104,8 +137,13 @@ export async function fetchProducts(categorySlug?: string) {
   return products.data;
 }
 
-export async function fetchProductBySlug(slug: string) {
-  const response = await fetch(`${baseURL}/products/slug/${slug}`);
+export async function fetchProductBySlug(slug: string, language?: Language) {
+  const url = new URL(`${baseURL}/products/slug/${slug}`);
+  if (language) {
+    url.searchParams.set("locale", language);
+  }
+
+  const response = await fetch(url.toString());
 
   if (!response.ok) {
     throw data({ message: "Product not found" }, { status: 404 });
