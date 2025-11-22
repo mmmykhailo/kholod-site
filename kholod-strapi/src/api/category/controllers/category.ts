@@ -7,6 +7,8 @@ export default factories.createCoreController(
       const { slug } = ctx.params;
       if (!slug) return ctx.badRequest("Missing slug parameter");
 
+      const locale = ctx.query?.locale as string | undefined;
+
       const populate = {
         childrenCategories: {
           populate: {
@@ -42,10 +44,18 @@ export default factories.createCoreController(
         specificationFilters: true,
       };
 
-      const category = await strapi.db.query("api::category.category").findOne({
-        where: { slug },
-        populate,
-      });
+      const where: any = { slug };
+
+      if (locale) {
+        where.locale = locale;
+      }
+
+      const category = await strapi.db
+        .query("api::category.category")
+        .findOne({
+          where,
+          populate,
+        });
 
       if (!category) return ctx.notFound(`Category not found: ${slug}`);
 
@@ -59,6 +69,8 @@ export default factories.createCoreController(
       const segments = path.split("/").filter(Boolean);
       let currentParent = null;
       let currentCategory = null;
+
+      const locale = ctx.query?.locale as string | undefined;
 
       const populate = {
         childrenCategories: {
@@ -79,15 +91,21 @@ export default factories.createCoreController(
       };
 
       for (const slug of segments) {
+        const where: any = {
+          slug,
+          ...(currentParent
+            ? { parentCategory: currentParent.id }
+            : { parentCategory: null }),
+        };
+
+        if (locale) {
+          where.locale = locale;
+        }
+
         const category = await strapi.db
           .query("api::category.category")
           .findOne({
-            where: {
-              slug,
-              ...(currentParent
-                ? { parentCategory: currentParent.id }
-                : { parentCategory: null }),
-            },
+            where,
             populate,
           });
 
