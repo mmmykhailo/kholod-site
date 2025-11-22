@@ -1,18 +1,16 @@
 import { useCallback, useMemo } from "react";
 import { useLoaderData, useSearchParams } from "react-router";
-import type { Route } from "./+types/($lang).(headered).catalog.$slug";
+import type { Route } from "./+types/catalog.$slug";
 import { fetchCategoryBySlug } from "~/lib/http";
 import Container from "~/components/ui/container";
 import { ProductCard } from "~/components/product-card";
 import { CategoryCard } from "~/components/category-card";
-import { Breadcrumbs, type BreadcrumbItem } from "~/components/breadcrumbs";
+import { Breadcrumbs } from "~/components/breadcrumbs";
 import { strapiUrl } from "~/lib/urls";
 import { Button } from "~/components/ui/button";
 import { ProductFilter } from "~/components/product-filter";
 import type { SpecificationFilter } from "~/lib/types/specification";
 import type { Product } from "~/lib/types/product";
-import { getLanguageFromRequest, buildLocalizedPath } from "~/lib/i18n";
-import { useLanguage } from "~/lib/language-context";
 
 type ActiveFilterState = Record<
   string,
@@ -137,16 +135,14 @@ export function meta({ loaderData }: Route.MetaArgs) {
   ];
 }
 
-export async function loader({ params, request }: Route.LoaderArgs) {
-  const language = getLanguageFromRequest(request);
-  const category = await fetchCategoryBySlug(params.slug, language);
+export async function loader({ params }: Route.LoaderArgs) {
+  const category = await fetchCategoryBySlug(params.slug);
 
   return { category };
 }
 
 export default function CategoryPage() {
   const { category } = useLoaderData<typeof loader>();
-  const { language } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filtersConfig = category.specificationFilters ?? [];
@@ -308,23 +304,16 @@ export default function CategoryPage() {
     return categories;
   };
 
-  const breadcrumbs: BreadcrumbItem[] = [
+  const breadcrumbs = [
     { label: "Головна", href: "/" },
     { label: "Каталог", href: "/catalog" },
     ...buildParentHierarchy(),
     { label: category.name },
   ];
 
-  const localizedBreadcrumbs: BreadcrumbItem[] = breadcrumbs.map(
-    (item: BreadcrumbItem): BreadcrumbItem =>
-      item.href
-        ? { ...item, href: buildLocalizedPath(language, item.href) }
-        : item
-  );
-
   return (
     <Container className="py-12">
-      <Breadcrumbs items={localizedBreadcrumbs} className="mb-6" />
+      <Breadcrumbs items={breadcrumbs} className="mb-6" />
 
       {/* Category Header */}
       <div className="mb-12">

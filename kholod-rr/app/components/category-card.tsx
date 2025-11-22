@@ -1,8 +1,6 @@
 import { Link } from "react-router";
 import type { Category } from "~/lib/types/category";
 import { strapiUrl } from "~/lib/urls";
-import { useLanguage } from "~/lib/language-context";
-import { buildLocalizedPath } from "~/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 type CategoryCardProps = {
@@ -10,18 +8,12 @@ type CategoryCardProps = {
 };
 
 export function CategoryCard({ category }: CategoryCardProps) {
-  const { language } = useLanguage();
   const imageUrl = category.image
     ? `${strapiUrl}${category.image.url}`
     : "/placeholder-category.png";
 
-  const categoryPath = buildLocalizedPath(
-    language,
-    `/catalog/${category.slug}`
-  );
-
   return (
-    <Link to={categoryPath}>
+    <Link to={`/catalog/${category.slug}`}>
       <Card className="overflow-hidden transition-shadow hover:shadow-lg">
         <div className="relative aspect-video overflow-hidden bg-muted">
           <img

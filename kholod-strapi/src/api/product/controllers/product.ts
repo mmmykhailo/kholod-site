@@ -7,16 +7,8 @@ export default factories.createCoreController(
       const { slug } = ctx.params;
       if (!slug) return ctx.badRequest("Missing slug parameter");
 
-      const locale = ctx.query?.locale as string | undefined;
-
-      const where: any = { slug };
-
-      if (locale) {
-        where.locale = locale;
-      }
-
       const product = await strapi.db.query("api::product.product").findOne({
-        where,
+        where: { slug },
         populate: {
           images: true,
           category: {
@@ -69,25 +61,17 @@ export default factories.createCoreController(
       let currentParent = null;
       let targetCategory = null;
 
-      const locale = ctx.query?.locale as string | undefined;
-
       // Navigate through the category hierarchy
       for (const slug of categorySegments) {
-        const whereCategory: any = {
-          slug,
-          ...(currentParent
-            ? { parentCategory: currentParent.id }
-            : { parentCategory: null }),
-        };
-
-        if (locale) {
-          whereCategory.locale = locale;
-        }
-
         const category = await strapi.db
           .query("api::category.category")
           .findOne({
-            where: whereCategory,
+            where: {
+              slug,
+              ...(currentParent
+                ? { parentCategory: currentParent.id }
+                : { parentCategory: null }),
+            },
           });
 
         if (!category)
@@ -98,17 +82,11 @@ export default factories.createCoreController(
       }
 
       // Find the product by slug and category
-      const whereProduct: any = {
-        slug: productSlug,
-        ...(targetCategory ? { category: targetCategory.id } : {}),
-      };
-
-      if (locale) {
-        whereProduct.locale = locale;
-      }
-
       const product = await strapi.db.query("api::product.product").findOne({
-        where: whereProduct,
+        where: {
+          slug: productSlug,
+          ...(targetCategory ? { category: targetCategory.id } : {}),
+        },
         populate: {
           images: true,
           category: {

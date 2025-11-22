@@ -1,16 +1,14 @@
-import type { Route } from "./+types/($lang).(headered).product.$slug";
+import type { Route } from "./+types/product.$slug";
 import { useState } from "react";
 import { fetchProductBySlug } from "~/lib/http";
 import Container from "~/components/ui/container";
-import { Breadcrumbs, type BreadcrumbItem } from "~/components/breadcrumbs";
+import { Breadcrumbs } from "~/components/breadcrumbs";
 import { strapiUrl } from "~/lib/urls";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { marked } from "marked";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { SpecificationTable } from "~/components/specification-table";
-import { getLanguageFromRequest, buildLocalizedPath } from "~/lib/i18n";
-import { useLanguage } from "~/lib/language-context";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   const { product } = loaderData;
@@ -30,16 +28,14 @@ export function meta({ loaderData }: Route.MetaArgs) {
   ];
 }
 
-export async function loader({ params, request }: Route.LoaderArgs) {
-  const language = getLanguageFromRequest(request);
-  const product = await fetchProductBySlug(params.slug, language);
+export async function loader({ params }: Route.LoaderArgs) {
+  const product = await fetchProductBySlug(params.slug);
 
   return { product };
 }
 
 export default function ProductPage({ loaderData }: Route.ComponentProps) {
   const { product } = loaderData;
-  const { language } = useLanguage();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const images =
@@ -78,23 +74,16 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
     return categories;
   };
 
-  const breadcrumbs: BreadcrumbItem[] = [
+  const breadcrumbs = [
     { label: "Головна", href: "/" },
     { label: "Каталог", href: "/catalog" },
     ...buildCategoryHierarchy(),
     { label: product.name },
   ];
 
-  const localizedBreadcrumbs: BreadcrumbItem[] = breadcrumbs.map(
-    (item: BreadcrumbItem): BreadcrumbItem =>
-      item.href
-        ? { ...item, href: buildLocalizedPath(language, item.href) }
-        : item
-  );
-
   return (
     <Container className="py-12">
-      <Breadcrumbs items={localizedBreadcrumbs} className="mb-6" />
+      <Breadcrumbs items={breadcrumbs} className="mb-6" />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
         {/* Product Images */}
@@ -122,36 +111,30 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
           {/* Image Thumbnails */}
           {images.length > 1 && (
             <div className="grid grid-cols-4 gap-4">
-              {images.map(
-                (
-                  image: { url: string; alternativeText?: string | null },
-                  index: number
-                ) => {
-                  const thumbUrl = image.url.startsWith("http")
-                    ? image.url
-                    : `${strapiUrl}${image.url}`;
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedImageIndex(index)}
-                      className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
-                        selectedImageIndex === index
-                          ? "border-primary"
-                          : "border-transparent hover:border-muted-foreground"
-                      }`}
-                    >
-                      <img
-                        src={thumbUrl}
-                        alt={
-                          image.alternativeText ||
-                          `${product.name} ${index + 1}`
-                        }
-                        className="h-full w-full object-cover"
-                      />
-                    </button>
-                  );
-                }
-              )}
+              {images.map((image, index) => {
+                const thumbUrl = image.url.startsWith("http")
+                  ? image.url
+                  : `${strapiUrl}${image.url}`;
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImageIndex(index)}
+                    className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
+                      selectedImageIndex === index
+                        ? "border-primary"
+                        : "border-transparent hover:border-muted-foreground"
+                    }`}
+                  >
+                    <img
+                      src={thumbUrl}
+                      alt={
+                        image.alternativeText || `${product.name} ${index + 1}`
+                      }
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -194,10 +177,7 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
             </CardHeader>
             <CardContent>
               <Link
-                to={buildLocalizedPath(
-                  language,
-                  `/catalog/${product.category.slug}`
-                )}
+                to={`/catalog/${product.category.slug}`}
                 className="text-primary hover:underline"
               >
                 {product.category.name}

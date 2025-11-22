@@ -8,7 +8,7 @@ import {
   ItemSeparator,
   ItemTitle,
 } from "~/components/ui/item";
-import type { Route } from "./+types/($lang).(headered).magnetic-calculator";
+import type { Route } from "./+types/calculator";
 import MagnetCalculatorForm from "~/components/calculator/MagnetCalculatorForm";
 import {
   calculateCurtainPrice,

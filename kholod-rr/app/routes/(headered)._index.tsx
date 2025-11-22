@@ -1,10 +1,9 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import BlockRenderer from "~/components/blocks/block-renderer";
-import type { Route } from "./+types/($lang).(headered)._index";
+import type { Route } from "./+types/$";
 import type { Page } from "~/lib/types/page";
 import { fetchPage } from "~/lib/http";
-import { getLanguageFromRequest, stripLanguagePrefix } from "~/lib/i18n";
 import Container from "~/components/ui/container";
 
 export function meta({ loaderData }: Route.MetaArgs) {
@@ -15,19 +14,10 @@ export function meta({ loaderData }: Route.MetaArgs) {
   return [{ title: page.title }, { name: "description", content: page.title }];
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  const language = getLanguageFromRequest(request);
-  const url = new URL(request.url);
-  const normalizedPath = stripLanguagePrefix(url.pathname);
+export async function loader({ params }: LoaderFunctionArgs) {
+  const splat = params["*"];
 
-  let splat: string | undefined;
-  if (normalizedPath === "/" || normalizedPath === "") {
-    splat = undefined;
-  } else {
-    splat = normalizedPath.replace(/^\//, "");
-  }
-
-  const page = await fetchPage(splat, language);
+  const page = await fetchPage(splat);
 
   return { page };
 }

@@ -10,7 +10,6 @@ export default factories.createCoreController(
       const segments = path.split("/").filter(Boolean);
       let currentParent = null;
       let currentPage = null;
-      const locale = ctx.query?.locale as string | undefined;
 
       const getFullPopulate = async (
         uid: string,
@@ -73,19 +72,13 @@ export default factories.createCoreController(
       console.log(JSON.stringify(populate));
 
       for (const slug of segments) {
-        const where: any = {
-          slug,
-          ...(currentParent
-            ? { parentPage: currentParent.id }
-            : { parentPage: null }),
-        };
-
-        if (locale) {
-          where.locale = locale;
-        }
-
         const page = await strapi.db.query("api::page.page").findOne({
-          where,
+          where: {
+            slug,
+            ...(currentParent
+              ? { parentPage: currentParent.id }
+              : { parentPage: null }),
+          },
           populate,
         });
 
