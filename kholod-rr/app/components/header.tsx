@@ -1,20 +1,15 @@
 import clsx from "clsx";
+import { LayoutGridIcon } from "lucide-react";
 import { Link } from "react-router";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "~/components/ui/navigation-menu";
+import { NavigationMenuLink } from "~/components/ui/navigation-menu";
 import type {
   MainNavigationItem,
   MainNavigationItems,
 } from "~/lib/types/main-navigation";
+import { cn } from "~/lib/utils";
 
 const itemClassName =
-  "group inline-flex h-9 w-max items-center justify-center bg-background py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-accent-foreground data-[state=open]:bg-accent/50 data-[state=open]:hover:bg-accent data-[state=open]:focus:bg-accent group min-h-16 px-8 rounded-none gap-2 cursor-pointer";
+  "group inline-flex h-9 w-max items-center justify-center bg-background py-2 text-lg font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-accent-foreground data-[state=open]:bg-accent/50 data-[state=open]:hover:bg-accent data-[state=open]:focus:bg-accent group min-h-16 px-8 rounded-none gap-2 cursor-pointer";
 
 // Recursive component for nested navigation items within dropdowns
 function NestedNavigationItem({
@@ -108,7 +103,16 @@ export default function Header({
         </div>
       </div>
       <div className="border-b">
-        <div className="container mx-auto">
+        <div className="container mx-auto flex items-center flex-wrap">
+          <button
+            className={cn(
+              itemClassName,
+              "border border-primary bg-primary/10 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/20 disabled:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50 rounded-lg font-semibold mr-2"
+            )}
+          >
+            <LayoutGridIcon className="w-6 h-6" />
+            Каталог
+          </button>
           {navigationItems.map((item) => {
             return (
               <Link
