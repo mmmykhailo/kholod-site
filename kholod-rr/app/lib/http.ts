@@ -62,7 +62,7 @@ export async function fetchGeneralSiteInfo() {
 
 export async function fetchTopLevelCategories() {
   const response = await fetch(
-    `${baseURL}/categories?populate[childrenCategories]=true&populate[image]=true&filters[parentCategory][$null]=true`,
+    `${baseURL}/categories?populate[childrenCategories][populate][image]=true&populate[image]=true&filters[parentCategory][$null]=true`,
   );
 
   if (!response.ok) {

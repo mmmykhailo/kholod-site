@@ -1,11 +1,16 @@
 import { Outlet, useLoaderData } from "react-router";
 import Header from "~/components/header";
-import { fetchNavigation, fetchGeneralSiteInfo } from "~/lib/http";
+import {
+  fetchNavigation,
+  fetchGeneralSiteInfo,
+  fetchTopLevelCategories,
+} from "~/lib/http";
 
 export async function loader() {
-  const [nav, generalInfo] = await Promise.all([
+  const [nav, generalInfo, categories] = await Promise.all([
     fetchNavigation(),
     fetchGeneralSiteInfo(),
+    fetchTopLevelCategories(),
   ]);
 
   const contactPhoneNumbers = generalInfo?.contactPhoneNumbers ?? "";
@@ -15,15 +20,20 @@ export async function loader() {
     .map((number) => number.trim())
     .filter((number) => number.length > 0);
 
-  return { nav, phoneNumbers };
+  return { nav, phoneNumbers, categories };
 }
 
 export default function HeaderedLayout() {
-  const { nav, phoneNumbers } = useLoaderData<typeof loader>();
+  const { nav, phoneNumbers, categories } = useLoaderData<typeof loader>();
 
+  console.log({ categories });
   return (
     <>
-      <Header navigationItems={nav} phoneNumbers={phoneNumbers} />
+      <Header
+        navigationItems={nav}
+        phoneNumbers={phoneNumbers}
+        categories={categories}
+      />
       <div id="main-content relative">
         <Outlet />
       </div>

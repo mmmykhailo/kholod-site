@@ -5,6 +5,7 @@ import CatalogDialog from "~/components/catalog-dialog";
 import CatalogSheet from "~/components/catalog-sheet";
 import { useMediaQuery } from "~/hooks/use-media-query";
 import type { MainNavigationItems } from "~/lib/types/main-navigation";
+import type { Category } from "~/lib/types/category";
 import { cn } from "~/lib/utils";
 
 const itemClassName =
@@ -12,12 +13,15 @@ const itemClassName =
 
 type HeaderProps = {
   navigationItems: MainNavigationItems;
+  phoneNumbers?: string[];
+  categories: Category[];
 };
 
 export default function Header({
   navigationItems,
   phoneNumbers,
-}: HeaderProps & { phoneNumbers?: string[] }) {
+  categories,
+}: HeaderProps) {
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -96,9 +100,10 @@ export default function Header({
           open={catalogOpen}
           onOpenChange={setCatalogOpen}
           headerHeight={headerHeight}
+          categories={categories}
         />
       ) : (
-        <CatalogDialog open={catalogOpen} onOpenChange={setCatalogOpen} />
+        <CatalogDialog open={catalogOpen} onOpenChange={setCatalogOpen} categories={categories} />
       )}
     </div>
   );

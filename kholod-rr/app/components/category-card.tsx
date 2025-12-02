@@ -1,20 +1,29 @@
 import { Link } from "react-router";
 import type { Category } from "~/lib/types/category";
 import { strapiUrl } from "~/lib/urls";
+import { cn } from "~/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 type CategoryCardProps = {
   category: Category;
+  variant?: "default" | "compact";
 };
 
-export function CategoryCard({ category }: CategoryCardProps) {
+export function CategoryCard({
+  category,
+  variant = "default",
+}: CategoryCardProps) {
   const imageUrl = category.image
     ? `${strapiUrl}${category.image.url}`
     : "/placeholder-category.png";
 
   return (
     <Link to={`/catalog/${category.slug}`}>
-      <Card className="overflow-hidden transition-shadow hover:shadow-lg">
+      <Card
+        className={cn("overflow-hidden shadow-none", {
+          "transition-shadow shadow hover:shadow-lg": variant === "default",
+        })}
+      >
         <div className="relative aspect-video overflow-hidden bg-muted">
           <img
             src={imageUrl}
@@ -23,15 +32,13 @@ export function CategoryCard({ category }: CategoryCardProps) {
           />
         </div>
         <CardHeader>
-          <CardTitle className="line-clamp-1">{category.name}</CardTitle>
-        </CardHeader>
-        {category.description && (
-          <CardContent>
+          <CardTitle className="line-clamp-1 pb-1">{category.name}</CardTitle>
+          {variant !== "compact" && category.description && (
             <p className="line-clamp-2 text-sm text-muted-foreground">
               {category.description}
             </p>
-          </CardContent>
-        )}
+          )}
+        </CardHeader>
       </Card>
     </Link>
   );
