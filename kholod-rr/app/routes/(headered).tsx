@@ -24,7 +24,9 @@ export default function HeaderedLayout() {
   return (
     <>
       <Header navigationItems={nav} phoneNumbers={phoneNumbers} />
-      <Outlet />
+      <div id="main-content relative">
+        <Outlet />
+      </div>
     </>
   );
 }

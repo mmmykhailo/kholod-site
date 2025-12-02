@@ -1,7 +1,9 @@
 import { LayoutGridIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import CatalogDialog from "~/components/catalog-dialog";
+import CatalogSheet from "~/components/catalog-sheet";
+import { useMediaQuery } from "~/hooks/use-media-query";
 import type { MainNavigationItems } from "~/lib/types/main-navigation";
 import { cn } from "~/lib/utils";
 
@@ -17,6 +19,29 @@ export default function Header({
   phoneNumbers,
 }: HeaderProps & { phoneNumbers?: string[] }) {
   const [catalogOpen, setCatalogOpen] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  useEffect(() => {
+    const headerElement = headerRef.current;
+    if (!headerElement) return;
+
+    const updateHeight = () => {
+      setHeaderHeight(headerElement.offsetHeight);
+    };
+
+    // Initial measurement
+    updateHeight();
+
+    // Observe size changes
+    const resizeObserver = new ResizeObserver(updateHeight);
+    resizeObserver.observe(headerElement);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   const cleanPhoneNumbers = (phoneNumbers ?? [])
     .map((number) => number.trim())
@@ -26,7 +51,7 @@ export default function Header({
     "tel:" + number.replace(/[^\d+]/g, "");
 
   return (
-    <div>
+    <div ref={headerRef} className="relative z-20 bg-white">
       <div className="border-b">
         <div className="container mx-auto flex justify-end items-center gap-6 px-4 py-2">
           {cleanPhoneNumbers.length > 0 &&
@@ -42,7 +67,7 @@ export default function Header({
         </div>
       </div>
       <div className="border-b">
-        <div className="container mx-auto flex items-center flex-wrap">
+        <div className="container mx-auto px-4 flex items-center flex-wrap">
           <button
             onClick={() => setCatalogOpen(true)}
             className={cn(
@@ -66,7 +91,15 @@ export default function Header({
           })}
         </div>
       </div>
-      <CatalogDialog open={catalogOpen} onOpenChange={setCatalogOpen} />
+      {isDesktop ? (
+        <CatalogSheet
+          open={catalogOpen}
+          onOpenChange={setCatalogOpen}
+          headerHeight={headerHeight}
+        />
+      ) : (
+        <CatalogDialog open={catalogOpen} onOpenChange={setCatalogOpen} />
+      )}
     </div>
   );
 }
