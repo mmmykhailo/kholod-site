@@ -1,5 +1,30 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface SharedHoverableBannersGrid extends Struct.ComponentSchema {
+  collectionName: 'components_shared_hoverable_banners_grids';
+  info: {
+    displayName: 'HoverableBannersGrid';
+  };
+  attributes: {
+    banners: Schema.Attribute.Component<'shared.hoverable-image-banner', true> &
+      Schema.Attribute.Required;
+  };
+}
+
+export interface SharedHoverableImageBanner extends Struct.ComponentSchema {
+  collectionName: 'components_shared_hoverable_image_banners';
+  info: {
+    displayName: 'HoverableImageBanner';
+  };
+  attributes: {
+    description: Schema.Attribute.String;
+    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'> &
+      Schema.Attribute.Required;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
+    url: Schema.Attribute.String;
+  };
+}
+
 export interface SharedImageBanner extends Struct.ComponentSchema {
   collectionName: 'components_shared_image_banners';
   info: {
@@ -94,6 +119,8 @@ export interface SharedThreeImagesBanner extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'shared.hoverable-banners-grid': SharedHoverableBannersGrid;
+      'shared.hoverable-image-banner': SharedHoverableImageBanner;
       'shared.image-banner': SharedImageBanner;
       'shared.rich-text': SharedRichText;
       'shared.seo': SharedSeo;

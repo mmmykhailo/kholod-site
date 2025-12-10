@@ -6,11 +6,17 @@ import ThreeImagesBannerBlock, {
 import ImageBannerBlock, {
   type ImageBannerBlockProps,
 } from "./image-banner-block";
+import type { HoverableBannersGridProps } from "./hoverable-banners-grid";
+import HoverableBannersGrid from "./hoverable-banners-grid";
+import type { HoverableImageBannerBlockProps } from "./hoverable-image-banner-block";
+import HoverableImageBannerBlock from "./hoverable-image-banner-block";
 
 type Component =
   | RichTextBlockProps
   | ImageBannerBlockProps
-  | ThreeImagesBannerBlockProps;
+  | ThreeImagesBannerBlockProps
+  | HoverableBannersGridProps
+  | HoverableImageBannerBlockProps;
 
 export default function BlockRenderer({ block }: { block: unknown }) {
   if (!block || typeof block !== "object" || !("__component" in block)) {
@@ -36,6 +42,18 @@ export default function BlockRenderer({ block }: { block: unknown }) {
       return (
         <Container>
           <ImageBannerBlock block={typedBlock} className="aspect-video" />
+        </Container>
+      );
+    case "shared.hoverable-banners-grid":
+      return (
+        <Container>
+          <HoverableBannersGrid block={typedBlock} />
+        </Container>
+      );
+    case "shared.hoverable-image-banner":
+      return (
+        <Container>
+          <HoverableImageBannerBlock block={typedBlock} />
         </Container>
       );
     default:

@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_shared_hoverable_banners_grids",
+  "info": {
+    "displayName": "HoverableBannersGrid"
+  },
+  "options": {},
+  "attributes": {
+    "banners": {
+      "type": "component",
+      "component": "shared.hoverable-image-banner",
+      "repeatable": true,
+      "required": true
+    }
+  },
+  "config": {}
+}

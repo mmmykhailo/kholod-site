@@ -557,7 +557,12 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
   };
   attributes: {
     blocks: Schema.Attribute.DynamicZone<
-      ['shared.rich-text', 'shared.three-images-banner', 'shared.image-banner']
+      [
+        'shared.rich-text',
+        'shared.three-images-banner',
+        'shared.image-banner',
+        'shared.hoverable-banners-grid',
+      ]
     > &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
