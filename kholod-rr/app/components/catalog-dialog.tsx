@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import type { Category } from "~/lib/types/category";
-import { CatalogSheetContent } from "./catalog-sheet-content";
+import { CatalogDialogContent } from "./catalog-dialog-content";
 
 type CatalogDialogProps = {
   open: boolean;
@@ -30,7 +30,7 @@ export default function CatalogDialog({
             <DialogTitle>Каталог</DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <CatalogSheetContent
+            <CatalogDialogContent
               categories={categories}
               onNavigate={handleNavigate}
             />
