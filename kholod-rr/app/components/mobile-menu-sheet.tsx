@@ -1,12 +1,6 @@
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "~/components/ui/sheet";
+import { Sheet, SheetContent } from "~/components/ui/sheet";
 import { Link } from "react-router";
 import type { MainNavigationItems } from "~/lib/types/main-navigation";
-import { cn } from "~/lib/utils";
 
 type MobileMenuSheetProps = {
   open: boolean;
@@ -53,10 +47,6 @@ export default function MobileMenuSheet({
         }}
       >
         <div className="container mx-auto px-4 py-6">
-          <SheetHeader className="mb-6">
-            <SheetTitle className="text-2xl font-bold">Меню</SheetTitle>
-          </SheetHeader>
-
           <nav className="flex flex-col gap-2">
             {navigationItems.map((item) => (
               <Link
