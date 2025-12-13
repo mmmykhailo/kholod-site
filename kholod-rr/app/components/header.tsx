@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import CatalogDialog from "~/components/catalog-dialog";
 import CatalogSheet from "~/components/catalog-sheet";
+import ContactDialog from "~/components/contact-dialog";
 import { useMediaQuery } from "~/hooks/use-media-query";
 import type { MainNavigationItems } from "~/lib/types/main-navigation";
 import type { Category } from "~/lib/types/category";
@@ -23,6 +24,7 @@ export default function Header({
   categories,
 }: HeaderProps) {
   const [catalogOpen, setCatalogOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const headerRef = useRef<HTMLDivElement>(null);
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -93,6 +95,15 @@ export default function Header({
               </Link>
             );
           })}
+          <button
+            onClick={() => setContactOpen(true)}
+            className={cn(
+              itemClassName,
+              "ml-auto border border-primary rounded-full text-base my-1 py-3 px-5 h-auto min-h-0",
+            )}
+          >
+            Замовити дзвінок
+          </button>
         </div>
       </div>
       {isDesktop ? (
@@ -103,8 +114,13 @@ export default function Header({
           categories={categories}
         />
       ) : (
-        <CatalogDialog open={catalogOpen} onOpenChange={setCatalogOpen} categories={categories} />
+        <CatalogDialog
+          open={catalogOpen}
+          onOpenChange={setCatalogOpen}
+          categories={categories}
+        />
       )}
+      <ContactDialog open={contactOpen} onOpenChange={setContactOpen} />
     </div>
   );
 }
