@@ -31,8 +31,8 @@ export default function CatalogSheet({
         overlayClassName="z-[19]"
         className="z-[19] overflow-y-auto"
         style={{
-          paddingTop: `${headerHeight + 24}px`,
           maxHeight: `calc(90vh - ${headerHeight}px)`,
+          paddingTop: `${headerHeight}px`,
         }}
       >
         <CatalogSheetContent

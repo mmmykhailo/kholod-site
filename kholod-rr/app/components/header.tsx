@@ -57,7 +57,7 @@ export default function Header({
     "tel:" + number.replace(/[^\d+]/g, "");
 
   return (
-    <div ref={headerRef} className="relative z-20 bg-white">
+    <div ref={headerRef} className="relative z-20 bg-white pointer-events-auto">
       <div className="border-b">
         <div className="container mx-auto flex justify-end items-center gap-6 px-4 py-2">
           {cleanPhoneNumbers.length > 0 &&
@@ -79,6 +79,9 @@ export default function Header({
             className={cn(
               itemClassName,
               "border border-primary bg-primary/10 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/20 disabled:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50 rounded-lg font-semibold mr-2",
+              {
+                "pointer-events-none": catalogOpen,
+              },
             )}
           >
             <LayoutGridIcon className="w-6 h-6" />
