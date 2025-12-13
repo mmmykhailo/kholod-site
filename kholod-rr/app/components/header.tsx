@@ -1,9 +1,10 @@
-import { LayoutGridIcon } from "lucide-react";
+import { LayoutGridIcon, MenuIcon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import CatalogDialog from "~/components/catalog-dialog";
 import CatalogSheet from "~/components/catalog-sheet";
 import ContactDialog from "~/components/contact-dialog";
+import MobileMenuSheet from "~/components/mobile-menu-sheet";
 import { useMediaQuery } from "~/hooks/use-media-query";
 import type { MainNavigationItems } from "~/lib/types/main-navigation";
 import type { Category } from "~/lib/types/category";
@@ -25,6 +26,7 @@ export default function Header({
 }: HeaderProps) {
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const headerRef = useRef<HTMLDivElement>(null);
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -58,7 +60,7 @@ export default function Header({
 
   return (
     <div ref={headerRef} className="relative z-20 bg-white pointer-events-auto">
-      <div className="border-b">
+      <div className="border-b hidden md:block">
         <div className="container mx-auto flex justify-end items-center gap-6 px-4 py-2">
           {cleanPhoneNumbers.length > 0 &&
             cleanPhoneNumbers.map((number) => (
@@ -92,7 +94,7 @@ export default function Header({
               <Link
                 key={item.documentId}
                 to={item.path}
-                className={itemClassName}
+                className={cn(itemClassName, "hidden md:inline-flex")}
               >
                 {item.title}
               </Link>
@@ -102,10 +104,30 @@ export default function Header({
             onClick={() => setContactOpen(true)}
             className={cn(
               itemClassName,
-              "ml-auto border border-primary rounded-full text-base my-1 py-3 px-5 h-auto min-h-0",
+              "ml-auto border border-primary rounded-full text-base my-1 py-3 px-5 h-auto min-h-0 hidden md:inline-flex",
             )}
           >
             Замовити дзвінок
+          </button>
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className={cn(itemClassName, "ml-auto relative md:hidden", {
+              "pointer-events-none": mobileMenuOpen,
+            })}
+          >
+            <MenuIcon
+              className={cn(
+                "w-6 h-6 absolute transition-opacity duration-300",
+                mobileMenuOpen ? "opacity-0" : "opacity-100",
+              )}
+            />
+            <XIcon
+              className={cn(
+                "w-6 h-6 absolute transition-opacity duration-300",
+                mobileMenuOpen ? "opacity-100" : "opacity-0",
+              )}
+            />
+            <span className="opacity-0 w-6 h-6">Menu</span>
           </button>
         </div>
       </div>
@@ -124,6 +146,16 @@ export default function Header({
         />
       )}
       <ContactDialog open={contactOpen} onOpenChange={setContactOpen} />
+      {!isDesktop && (
+        <MobileMenuSheet
+          open={mobileMenuOpen}
+          onOpenChange={setMobileMenuOpen}
+          headerHeight={headerHeight}
+          navigationItems={navigationItems}
+          phoneNumbers={phoneNumbers}
+          onContactClick={() => setContactOpen(true)}
+        />
+      )}
     </div>
   );
 }
