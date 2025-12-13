@@ -4,11 +4,13 @@ import { fetchProductBySlug } from "~/lib/http";
 import Container from "~/components/ui/container";
 import { Breadcrumbs } from "~/components/breadcrumbs";
 import { strapiUrl } from "~/lib/urls";
-import { Link } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { Button } from "~/components/ui/button";
 import { marked } from "marked";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { SpecificationTable } from "~/components/specification-table";
+import OrderDialog from "~/components/order-dialog";
+import type { Image } from "~/lib/types/image";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   const { product } = loaderData;
@@ -34,9 +36,10 @@ export async function loader({ params }: Route.LoaderArgs) {
   return { product };
 }
 
-export default function ProductPage({ loaderData }: Route.ComponentProps) {
-  const { product } = loaderData;
+export default function ProductPage() {
+  const { product } = useLoaderData<typeof loader>();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
   const images =
     product.images && product.images.length > 0
@@ -165,7 +168,11 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
 
           {product.inStock && (
             <div>
-              <Button size="2xl" className="w-full" disabled={!product.inStock}>
+              <Button
+                size="2xl"
+                className="w-full"
+                onClick={() => setOrderDialogOpen(true)}
+              >
                 Замовити
               </Button>
             </div>
@@ -223,6 +230,14 @@ export default function ProductPage({ loaderData }: Route.ComponentProps) {
           </div>
         ) : null}
       </div>
+
+      <OrderDialog
+        open={orderDialogOpen}
+        onOpenChange={setOrderDialogOpen}
+        productName={product.name}
+        productSku={product.sku}
+        productUrl={`/product/${product.slug}`}
+      />
     </Container>
   );
 }

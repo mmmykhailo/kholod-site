@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import type { Category } from "~/lib/types/category";
 import { strapiUrl } from "~/lib/urls";
 import { cn } from "~/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardHeader, CardTitle } from "./ui/card";
 
 type CategoryCardProps = {
   category: Category;
