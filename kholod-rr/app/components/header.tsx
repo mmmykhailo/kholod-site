@@ -11,7 +11,7 @@ import type { Category } from "~/lib/types/category";
 import { cn } from "~/lib/utils";
 
 const itemClassName =
-  "group inline-flex h-9 w-max items-center justify-center bg-background py-2 text-base font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-accent-foreground data-[state=open]:bg-accent/50 data-[state=open]:hover:bg-accent data-[state=open]:focus:bg-accent group min-h-16 px-8 rounded-none gap-2 cursor-pointer";
+  "group inline-flex w-max items-center justify-center bg-background py-2 text-base font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-accent-foreground data-[state=open]:bg-accent/50 data-[state=open]:hover:bg-accent data-[state=open]:focus:bg-accent group min-h-10 md:min-h-16 px-4 md:px-8 rounded-none gap-2 cursor-pointer";
 
 type HeaderProps = {
   navigationItems: MainNavigationItems;
@@ -75,7 +75,7 @@ export default function Header({
         </div>
       </div>
       <div className="border-b">
-        <div className="container mx-auto px-4 flex items-center flex-wrap">
+        <div className="container mx-auto px-4 flex items-center flex-wrap py-3 md:py-0">
           <button
             onClick={() => setCatalogOpen(true)}
             className={cn(
@@ -104,7 +104,7 @@ export default function Header({
             onClick={() => setContactOpen(true)}
             className={cn(
               itemClassName,
-              "ml-auto border border-primary rounded-full text-base my-1 py-3 px-5 h-auto min-h-0 hidden md:inline-flex",
+              "ml-auto border border-primary rounded-full text-base my-1 py-3 px-5 h-auto md:min-h-0 hidden md:inline-flex",
             )}
           >
             Замовити дзвінок
