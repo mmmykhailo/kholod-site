@@ -29,10 +29,7 @@ export default function Page() {
 
   return (
     <div className="min-h-screen pb-16">
-      <Container className="mt-8">
-        <h1 className="text-4xl font-bold mb-8">{page.title}</h1>
-      </Container>
-      <div className="grid gap-8">
+      <div className="grid gap-8 mt-8">
         {(page.blocks as Array<unknown>)?.map((block, i) => (
           <BlockRenderer key={i} block={block} />
         ))}
