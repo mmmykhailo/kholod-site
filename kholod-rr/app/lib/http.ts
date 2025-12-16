@@ -40,7 +40,7 @@ export async function fetchPage(splat: string | undefined) {
 
 export async function fetchNavigation() {
   const response = await fetch(
-    `${baseURL}/navigation/render/agxhqhpkugvgtalcztlckvzm?type=TREE`,
+    `${baseURL}/navigation/render/vh4jom50euiqflxbs6a5mvdn?type=TREE`,
   );
 
   if (!response.ok) {

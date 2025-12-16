@@ -27,7 +27,6 @@ export async function loader() {
 export default function HeaderedLayout() {
   const { nav, phoneNumbers, categories } = useLoaderData<typeof loader>();
 
-  console.log({ categories });
   return (
     <>
       <Header
