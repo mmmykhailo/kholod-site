@@ -2,6 +2,9 @@ import { cn } from "~/lib/utils";
 import type { Image } from "~/lib/types/image";
 import { url } from "~/lib/urls";
 import Container from "../ui/container";
+import { useEffect, useRef } from "react";
+import PhotoSwipeLightbox from "photoswipe/lightbox";
+import "photoswipe/style.css";
 
 export type GalleryBlockProps = {
   __component: "shared.gallery";
@@ -10,9 +13,34 @@ export type GalleryBlockProps = {
 };
 
 export default function GalleryBlock({ block }: { block: GalleryBlockProps }) {
+  const galleryId = `gallery-${block.id}`;
+  const lightboxRef = useRef<PhotoSwipeLightbox | null>(null);
+
   const getImageUrl = (image: Image) => {
     return url(image.formats?.large?.url || image.url);
   };
+
+  const getFullImageUrl = (image: Image) => {
+    return url(image.url);
+  };
+
+  useEffect(() => {
+    if (!lightboxRef.current) {
+      lightboxRef.current = new PhotoSwipeLightbox({
+        gallery: `#${galleryId}`,
+        children: "a",
+        pswpModule: () => import("photoswipe"),
+      });
+      lightboxRef.current.init();
+    }
+
+    return () => {
+      if (lightboxRef.current) {
+        lightboxRef.current.destroy();
+        lightboxRef.current = null;
+      }
+    };
+  }, [galleryId]);
 
   // Split images into sections for the grid layout
   // Alternating pattern: 1 image, then 4 images in grid, then 1 image, then 4 images, etc.
@@ -45,23 +73,32 @@ export default function GalleryBlock({ block }: { block: GalleryBlockProps }) {
     <section className="py-8 sm:py-16 lg:py-24">
       <Container>
         {/* Gallery Grid */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div id={galleryId} className="grid gap-6 md:grid-cols-2">
           {sections.map((section, sectionIndex) => (
             <div
               key={sectionIndex}
-              className={cn({
-                "grid grid-cols-2 gap-6": section.type === "grid",
+              className={cn("grid", {
+                "grid-cols-2 gap-6": section.type === "grid",
               })}
             >
               {section.images.map((image, imageIndex) => (
-                <img
+                <a
                   key={imageIndex}
-                  src={getImageUrl(image)}
-                  alt={
-                    image.alternativeText || `Gallery image ${imageIndex + 1}`
-                  }
-                  className="rounded-lg object-cover w-full h-full"
-                />
+                  href={getFullImageUrl(image)}
+                  data-pswp-width={image.width}
+                  data-pswp-height={image.height}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block rounded-lg overflow-hidden cursor-pointer"
+                >
+                  <img
+                    src={getImageUrl(image)}
+                    alt={
+                      image.alternativeText || `Gallery image ${imageIndex + 1}`
+                    }
+                    className="rounded-lg object-cover w-full h-full transition-transform"
+                  />
+                </a>
               ))}
             </div>
           ))}
