@@ -563,6 +563,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'shared.image-banner',
         'shared.hoverable-banners-grid',
         'shared.contacts-block',
+        'shared.gallery',
       ]
     > &
       Schema.Attribute.SetPluginOptions<{

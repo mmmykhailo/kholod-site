@@ -29,6 +29,17 @@ export interface SharedContactsBlock extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedGallery extends Struct.ComponentSchema {
+  collectionName: 'components_shared_galleries';
+  info: {
+    description: 'A gallery of images displayed in a grid layout';
+    displayName: 'Gallery';
+  };
+  attributes: {
+    images: Schema.Attribute.Media<'images', true> & Schema.Attribute.Required;
+  };
+}
+
 export interface SharedHoverableBannersGrid extends Struct.ComponentSchema {
   collectionName: 'components_shared_hoverable_banners_grids';
   info: {
@@ -150,6 +161,7 @@ declare module '@strapi/strapi' {
     export interface ComponentSchemas {
       'shared.contact': SharedContact;
       'shared.contacts-block': SharedContactsBlock;
+      'shared.gallery': SharedGallery;
       'shared.hoverable-banners-grid': SharedHoverableBannersGrid;
       'shared.hoverable-image-banner': SharedHoverableImageBanner;
       'shared.image-banner': SharedImageBanner;

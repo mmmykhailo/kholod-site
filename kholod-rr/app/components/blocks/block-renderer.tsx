@@ -11,6 +11,7 @@ import HoverableBannersGrid from "./hoverable-banners-grid";
 import type { HoverableImageBannerBlockProps } from "./hoverable-image-banner-block";
 import HoverableImageBannerBlock from "./hoverable-image-banner-block";
 import ContactsBlock, { type ContactsBlockProps } from "./contacts-block";
+import GalleryBlock, { type GalleryBlockProps } from "./gallery-block";
 
 type Component =
   | RichTextBlockProps
@@ -18,7 +19,8 @@ type Component =
   | ThreeImagesBannerBlockProps
   | HoverableBannersGridProps
   | HoverableImageBannerBlockProps
-  | ContactsBlockProps;
+  | ContactsBlockProps
+  | GalleryBlockProps;
 
 export default function BlockRenderer({ block }: { block: unknown }) {
   if (!block || typeof block !== "object" || !("__component" in block)) {
@@ -64,6 +66,8 @@ export default function BlockRenderer({ block }: { block: unknown }) {
           <ContactsBlock block={typedBlock} />
         </Container>
       );
+    case "shared.gallery":
+      return <GalleryBlock block={typedBlock} />;
     default:
       return null;
   }

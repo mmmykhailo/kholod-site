@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_galleries",
+  "info": {
+    "displayName": "Gallery",
+    "description": "A gallery of images displayed in a grid layout"
+  },
+  "options": {},
+  "attributes": {
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  },
+  "config": {}
+}
