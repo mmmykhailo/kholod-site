@@ -75,7 +75,7 @@ export default function Header({
         </div>
       </div>
       <div className="border-b">
-        <div className="container mx-auto px-4 flex items-center flex-wrap py-3 md:py-0">
+        <div className="container mx-auto px-4 flex items-center flex-wrap py-3 md:py-2">
           <button
             onClick={() => setCatalogOpen(true)}
             className={cn(
