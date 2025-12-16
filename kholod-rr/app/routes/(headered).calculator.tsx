@@ -8,8 +8,10 @@ import {
   ItemSeparator,
   ItemTitle,
 } from "~/components/ui/item";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
 import type { Route } from "./+types/(headered).calculator";
 import RegularCalculatorForm from "~/components/calculator/RegularCalculatorForm";
+import MagnetCalculatorForm from "~/components/calculator/MagnetCalculatorForm";
 import {
   calculateCurtainPrice,
   type CalculationResult,
@@ -51,7 +53,18 @@ export default function Calculator() {
                 <CardTitle>Параметри розрахунку</CardTitle>
               </CardHeader>
               <CardContent>
-                <RegularCalculatorForm />
+                <Tabs defaultValue="regular">
+                  <TabsList className="grid w-full grid-cols-2 mb-5">
+                    <TabsTrigger value="regular">Звичайні штори</TabsTrigger>
+                    <TabsTrigger value="magnet">Магнітні штори</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="regular">
+                    <RegularCalculatorForm />
+                  </TabsContent>
+                  <TabsContent value="magnet">
+                    <MagnetCalculatorForm />
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </div>

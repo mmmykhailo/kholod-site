@@ -2,7 +2,31 @@ import {
   regularCalculator,
   magnetCalculator,
 } from "~/lib/constants/calculator";
-import { ceilToFraction } from "~/lib/ceilToFraction";
+
+function metersToCornicePieces(value: number): number {
+  if (value <= 1.25) return 1;
+  if (value <= 1.4) return 1.1;
+  if (value <= 1.5) return 1.2;
+  if (value <= 1.6) return 1.3;
+  if (value <= 1.7) return 1.4;
+  if (value <= 1.8) return 1.5;
+  if (value <= 1.9) return 1.6;
+
+  if (value <= 2.5) return 2;
+  if (value <= 2.7) return 2.2;
+  if (value <= 2.9) return 2.4;
+  if (value <= 3.1) return 2.5;
+  if (value <= 3.3) return 2.7;
+
+  if (value <= 3.75) return 3;
+  if (value <= 4.4) return 3.5;
+  if (value <= 5) return 4;
+  if (value <= 5.6) return 4.5;
+  if (value <= 6.3) return 5;
+
+  // 6.3+ → кожні 1.25 = +1 шт, без пропорцій
+  return Math.ceil(value / 1.25);
+}
 
 export interface CalculationResult {
   width: number;
@@ -68,7 +92,8 @@ export function calculateCurtainPrice(
   }
 
   // Calculate real curtain width
-  const realCurtainWidth = numberOfStrips * stripWidth - (numberOfStrips - 1) * overlap;
+  const realCurtainWidth =
+    numberOfStrips * stripWidth - (numberOfStrips - 1) * overlap;
 
   // Calculate total ribbon length
   const totalRibbonLength = numberOfStrips * height;
@@ -96,30 +121,20 @@ export function calculateCurtainPrice(
 
   // Calculate cornice price
   let cornicePricePerItem = 0;
-  let corniceItemLength = 0;
 
   // Check if using magnet calculator (алюміній)
   if (corniceType === magnetCalculator.corniceType.value) {
     cornicePricePerItem = magnetCalculator.corniceType.pricePerItem;
-    corniceItemLength = magnetCalculator.corniceType.itemLength;
   } else {
     const corniceData = regularCalculator.corniceTypes.find(
       (ct) => ct.value === corniceType,
     );
     cornicePricePerItem = corniceData?.pricePerItem || 0;
-    corniceItemLength = corniceData?.itemLength || 0;
-  }
-  const cornicePricePerMeter = cornicePricePerItem / corniceItemLength;
-
-  let corniceMeters = width / 1000;
-  if (corniceMeters < corniceItemLength) {
-    corniceMeters = corniceItemLength;
   }
 
-  corniceMeters = ceilToFraction(corniceMeters, corniceItemLength / 2);
-
-  const cornicePrice = corniceMeters * cornicePricePerMeter;
-  const numberOfCorniceItems = corniceMeters / corniceItemLength;
+  const corniceMeters = width / 1000;
+  const numberOfCorniceItems = metersToCornicePieces(corniceMeters);
+  const cornicePrice = numberOfCorniceItems * cornicePricePerItem;
 
   // Calculate total price
   const totalPrice = ribbonPrice + planksPrice + cornicePrice;
