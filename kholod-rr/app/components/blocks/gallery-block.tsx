@@ -70,7 +70,7 @@ export default function GalleryBlock({ block }: { block: GalleryBlockProps }) {
   }
 
   return (
-    <section className="py-8 sm:py-16 lg:py-24">
+    <section>
       <Container>
         {/* Gallery Grid */}
         <div id={galleryId} className="grid gap-6 md:grid-cols-2">
