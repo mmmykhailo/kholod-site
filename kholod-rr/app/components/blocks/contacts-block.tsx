@@ -4,6 +4,7 @@ import {
   containerPaddingClassName,
   negativeContainerMarginClassName,
 } from "../ui/container";
+import GridBackground from "../ui/grid-background";
 
 export type ContactType = "address" | "phone" | "email";
 
@@ -50,21 +51,7 @@ export default function ContactsBlock({
 }) {
   return (
     <div className={cn("relative py-16 md:py-24")}>
-      {/* Background grid effect */}
-      <div
-        className={cn(
-          "absolute inset-y-0 left-1/2 -translate-x-1/2 w-screen -z-10 opacity-50 border-t border-b border-slate-400",
-          "before:bg-slate-100 before:content-[''] before:absolute before:inset-0 before:opacity-30",
-        )}
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, rgb(0 0 0 / 0.05) 1px, transparent 1px),
-            linear-gradient(to bottom, rgb(0 0 0 / 0.05) 1px, transparent 1px)
-          `,
-          backgroundSize: "160px 160px",
-          backgroundPosition: "20px 20px",
-        }}
-      />
+      <GridBackground />
 
       <div className="relative">
         <h2 className="text-4xl md:text-5xl font-bold mb-6">{block.heading}</h2>
