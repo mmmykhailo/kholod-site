@@ -39,11 +39,15 @@ export async function fetchPage(splat: string | undefined) {
 }
 
 export async function fetchNavigation() {
-  const navResponse = await fetch(
+  const response = await fetch(
     `${baseURL}/navigation/render/agxhqhpkugvgtalcztlckvzm?type=TREE`,
   );
 
-  const nav: MainNavigationItems = await navResponse.json();
+  if (!response.ok) {
+    return [];
+  }
+
+  const nav: MainNavigationItems = await response.json();
 
   return nav || [];
 }

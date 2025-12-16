@@ -25,8 +25,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export default function Page() {
   const { page } = useLoaderData<typeof loader>();
 
-  console.log(page);
-
   return (
     <div className="min-h-screen pb-16">
       <Container className="mt-8">

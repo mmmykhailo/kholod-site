@@ -1,5 +1,6 @@
 import { Outlet, useLoaderData } from "react-router";
 import Header from "~/components/header";
+import Footer from "~/components/footer";
 import {
   fetchNavigation,
   fetchGeneralSiteInfo,
@@ -37,6 +38,7 @@ export default function HeaderedLayout() {
       <div id="main-content relative">
         <Outlet />
       </div>
+      <Footer phoneNumbers={phoneNumbers} />
     </>
   );
 }
