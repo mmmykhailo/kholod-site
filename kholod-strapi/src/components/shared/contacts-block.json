@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_shared_contacts_blocks",
+  "info": {
+    "displayName": "Contacts Block",
+    "icon": "phone",
+    "description": "Block with heading, description and contact information"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "contacts": {
+      "type": "component",
+      "component": "shared.contact",
+      "repeatable": true,
+      "required": true
+    }
+  }
+}

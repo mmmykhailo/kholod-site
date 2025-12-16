@@ -1,5 +1,34 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface SharedContact extends Struct.ComponentSchema {
+  collectionName: 'components_shared_contacts';
+  info: {
+    description: 'Contact information with type (address, phone, email)';
+    displayName: 'Contact';
+    icon: 'phone';
+  };
+  attributes: {
+    type: Schema.Attribute.Enumeration<['address', 'phone', 'email']> &
+      Schema.Attribute.Required;
+    value: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface SharedContactsBlock extends Struct.ComponentSchema {
+  collectionName: 'components_shared_contacts_blocks';
+  info: {
+    description: 'Block with heading, description and contact information';
+    displayName: 'Contacts Block';
+    icon: 'phone';
+  };
+  attributes: {
+    contacts: Schema.Attribute.Component<'shared.contact', true> &
+      Schema.Attribute.Required;
+    description: Schema.Attribute.Text;
+    heading: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface SharedHoverableBannersGrid extends Struct.ComponentSchema {
   collectionName: 'components_shared_hoverable_banners_grids';
   info: {
@@ -119,6 +148,8 @@ export interface SharedThreeImagesBanner extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'shared.contact': SharedContact;
+      'shared.contacts-block': SharedContactsBlock;
       'shared.hoverable-banners-grid': SharedHoverableBannersGrid;
       'shared.hoverable-image-banner': SharedHoverableImageBanner;
       'shared.image-banner': SharedImageBanner;

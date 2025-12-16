@@ -10,13 +10,15 @@ import type { HoverableBannersGridProps } from "./hoverable-banners-grid";
 import HoverableBannersGrid from "./hoverable-banners-grid";
 import type { HoverableImageBannerBlockProps } from "./hoverable-image-banner-block";
 import HoverableImageBannerBlock from "./hoverable-image-banner-block";
+import ContactsBlock, { type ContactsBlockProps } from "./contacts-block";
 
 type Component =
   | RichTextBlockProps
   | ImageBannerBlockProps
   | ThreeImagesBannerBlockProps
   | HoverableBannersGridProps
-  | HoverableImageBannerBlockProps;
+  | HoverableImageBannerBlockProps
+  | ContactsBlockProps;
 
 export default function BlockRenderer({ block }: { block: unknown }) {
   if (!block || typeof block !== "object" || !("__component" in block)) {
@@ -54,6 +56,12 @@ export default function BlockRenderer({ block }: { block: unknown }) {
       return (
         <Container>
           <HoverableImageBannerBlock block={typedBlock} />
+        </Container>
+      );
+    case "shared.contacts-block":
+      return (
+        <Container>
+          <ContactsBlock block={typedBlock} />
         </Container>
       );
     default:

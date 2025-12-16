@@ -1,3 +1,8 @@
+import { cn } from "~/lib/utils";
+
+export const negativeContainerMarginClassName = "-mx-4";
+export const containerPaddingClassName = "px-4";
+
 export default function Container({
   className,
   children,
@@ -6,7 +11,9 @@ export default function Container({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`container mx-auto px-4 ${className ?? ""}`}>
+    <div
+      className={cn("container mx-auto", containerPaddingClassName, className)}
+    >
       {children}
     </div>
   );

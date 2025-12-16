@@ -65,7 +65,8 @@
         "shared.rich-text",
         "shared.three-images-banner",
         "shared.image-banner",
-        "shared.hoverable-banners-grid"
+        "shared.hoverable-banners-grid",
+        "shared.contacts-block"
       ]
     }
   }
