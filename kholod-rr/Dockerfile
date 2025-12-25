@@ -1,22 +1,42 @@
-FROM node:20-alpine AS development-dependencies-env
-COPY . /app
+# Stage 1: Bun base for fast dependency installation
+FROM oven/bun:1.3-alpine AS bun-base
 WORKDIR /app
-RUN npm ci
 
-FROM node:20-alpine AS production-dependencies-env
-COPY ./package.json package-lock.json /app/
-WORKDIR /app
-RUN npm ci --omit=dev
+# Stage 2: Install all dependencies with Bun (fast)
+FROM bun-base AS deps
+COPY package.json bun.lock* ./
+RUN bun install --frozen-lockfile
 
-FROM node:20-alpine AS build-env
-COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
-WORKDIR /app
-RUN npm run build
+# Stage 3: Build with Bun
+FROM bun-base AS build
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN bun run build
 
-FROM node:20-alpine
-COPY ./package.json package-lock.json /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
+# Stage 4: Install production dependencies with Bun
+FROM bun-base AS prod-deps
+COPY package.json bun.lock* ./
+RUN bun install --frozen-lockfile --production
+
+# Stage 5: Production runtime with Node.js (for React 19 SSR compatibility)
+FROM node:20-alpine AS runner
+
+# Set production environment
+ENV NODE_ENV=production
+
 WORKDIR /app
-CMD ["npm", "run", "start"]
+
+# Copy production dependencies from Bun stage
+COPY --from=prod-deps /app/node_modules ./node_modules
+
+# Copy build artifacts
+COPY --from=build /app/build ./build
+
+# Copy package.json for start script
+COPY package.json ./
+
+# Expose application port
+EXPOSE 3006
+
+# Start application with Node.js
+CMD ["node", "./node_modules/.bin/react-router-serve", "./build/server/index.js"]

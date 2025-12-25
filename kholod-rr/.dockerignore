@@ -1,4 +1,27 @@
+# React Router generated files
 .react-router
+
+# Build artifacts
 build
+
+# Dependencies (installed in container)
 node_modules
+
+# Documentation
 README.md
+
+# Environment files (externalized)
+.env
+
+# System files
+.DS_Store
+
+# Logs
+*.log
+
+# Version control
+.git
+.gitignore
+
+# Lock files
+bun.lock

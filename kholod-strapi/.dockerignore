@@ -1,0 +1,47 @@
+# Database files (managed by Docker volume)
+.tmp
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+
+# Dependencies (installed in container)
+node_modules
+
+# Build artifacts (rebuilt in container)
+dist
+
+# Environment files (externalized)
+.env
+
+# Strapi metadata
+.strapi
+.strapi-updater.json
+.strapi-cloud.json
+
+# Uploaded files (managed by Docker volume)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# System files
+.DS_Store
+
+# Version control
+.git
+.gitignore
+
+# Database migrations (can include these)
+# database
+
+# Development data
+data
+coverage
+
+# Documentation
+README.md
+
+# Seed scripts (not needed in production)
+scripts/seed-test-catalog.js
+
+# Lock files
+bun.lock

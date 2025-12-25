@@ -1,0 +1,64 @@
+services:
+  strapi:
+    build:
+      context: ./kholod-strapi
+      dockerfile: Dockerfile
+    container_name: kholod-strapi
+    ports:
+      - "1337:1337"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=1337
+      - APP_KEYS=${STRAPI_APP_KEYS}
+      - API_TOKEN_SALT=${STRAPI_API_TOKEN_SALT}
+      - ADMIN_JWT_SECRET=${STRAPI_ADMIN_JWT_SECRET}
+      - TRANSFER_TOKEN_SALT=${STRAPI_TRANSFER_TOKEN_SALT}
+      - JWT_SECRET=${STRAPI_JWT_SECRET}
+      - ENCRYPTION_KEY=${STRAPI_ENCRYPTION_KEY}
+      - DATABASE_CLIENT=sqlite
+      - DATABASE_FILENAME=.tmp/data.db
+      - DATABASE_SSL=false
+      - NODE_ENV=production
+    volumes:
+      - ./kholod-strapi/.tmp:/app/.tmp
+      - ./kholod-strapi/public/uploads:/app/public/uploads
+    networks:
+      - kholod-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:1337/api', (r) => process.exit(r.statusCode < 500 ? 0 : 1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  frontend:
+    build:
+      context: ./kholod-rr
+      dockerfile: Dockerfile
+    container_name: kholod-frontend
+    ports:
+      - "3006:3006"
+    environment:
+      - PORT=3006
+      - STRAPI_URL=http://strapi:1337
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - SYSTEM_EMAIL=${SYSTEM_EMAIL}
+      - NODE_ENV=production
+    depends_on:
+      strapi:
+        condition: service_healthy
+    networks:
+      - kholod-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3006', (r) => process.exit(r.statusCode < 500 ? 0 : 1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+networks:
+  kholod-network:
+    driver: bridge
