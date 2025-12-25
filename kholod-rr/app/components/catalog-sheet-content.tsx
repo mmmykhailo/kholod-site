@@ -4,6 +4,7 @@ import type { Category } from "~/lib/types/category";
 import { CategoryCard } from "./category-card";
 import { cn } from "~/lib/utils";
 import { ChevronRight } from "lucide-react";
+import { strapiUrl } from "~/lib/urls";
 
 type CatalogSheetContentProps = {
   categories: Category[];
@@ -22,8 +23,23 @@ export function CatalogSheetContent({
     setSelectedCategory(category);
   };
 
+  // Collect all subcategory image URLs for prefetching
+  const imageUrls = categories.flatMap((category) =>
+    category.childrenCategories
+      ?.filter((subCategory) => subCategory.image?.url)
+      .map((subCategory) => `${strapiUrl}${subCategory.image!.url}`) || []
+  );
+
   return (
-    <div className="flex gap-6 h-full">
+    <>
+      {/* Preload all category images using hidden img elements */}
+      <div className="hidden">
+        {imageUrls.map((url) => (
+          <img key={url} src={url} alt="" loading="eager" />
+        ))}
+      </div>
+
+      <div className="flex gap-6 h-full">
       {/* Left side - Top level categories list */}
       <div className="w-64 flex-shrink-0 flex flex-col">
         <nav className="space-y-1">
@@ -100,5 +116,6 @@ export function CatalogSheetContent({
         )}
       </div>
     </div>
+    </>
   );
 }
