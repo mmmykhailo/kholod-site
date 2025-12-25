@@ -7,20 +7,22 @@ import { Card, CardHeader, CardTitle } from "./ui/card";
 type CategoryCardProps = {
   category: Category;
   variant?: "default" | "compact";
+  onClick?: () => void;
 };
 
 export function CategoryCard({
   category,
   variant = "default",
+  onClick,
 }: CategoryCardProps) {
   const imageUrl = category.image
     ? `${strapiUrl}${category.image.url}`
     : "/placeholder-category.png";
 
   return (
-    <Link className="flex" to={`/catalog/${category.slug}`}>
+    <Link className="flex" to={`/catalog/${category.slug}`} onClick={onClick}>
       <Card
-        className={cn("overflow-hidden shadow-none", {
+        className={cn("overflow-hidden shadow-none w-full", {
           "transition-shadow shadow hover:shadow-lg": variant === "default",
         })}
       >

@@ -29,9 +29,9 @@ export default function CatalogSheet({
       <SheetContent
         side="top"
         overlayClassName="z-[19]"
-        className="z-[19] overflow-y-auto"
+        className="z-[19] overflow-y-auto flex"
         style={{
-          maxHeight: `calc(90vh - ${headerHeight}px)`,
+          height: `calc(90vh - ${headerHeight}px)`,
           paddingTop: `${headerHeight}px`,
         }}
       >

@@ -74,6 +74,7 @@ export function CatalogSheetContent({
                     key={subCategory.id}
                     category={subCategory}
                     variant="compact"
+                    onClick={onNavigate}
                   />
                 ))}
               </div>
