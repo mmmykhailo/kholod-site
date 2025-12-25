@@ -70,9 +70,11 @@ export function CatalogSheetContent({
             selectedCategory.childrenCategories.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {selectedCategory.childrenCategories.map((subCategory) => (
-                  <div key={subCategory.id} onClick={onNavigate}>
-                    <CategoryCard category={subCategory} variant="compact" />
-                  </div>
+                  <CategoryCard
+                    key={subCategory.id}
+                    category={subCategory}
+                    variant="compact"
+                  />
                 ))}
               </div>
             ) : (

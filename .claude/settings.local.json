@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "mcp__strapi__get-strapi-info",
+      "mcp__strapi__get-content-types",
+      "mcp__strapi__get-content-type-by-name",
+      "mcp__strapi__get-components",
+      "mcp__strapi__get-services",
+      "mcp__strapi__get-service-methods",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

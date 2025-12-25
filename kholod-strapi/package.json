@@ -10,6 +10,7 @@
     "dev": "strapi develop",
     "develop": "strapi develop",
     "seed:test-catalog": "node ./scripts/seed-test-catalog.js",
+    "seed:pvc-curtains": "node ./scripts/seed-pvc-curtains.js",
     "start": "strapi start",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
@@ -17,6 +18,7 @@
   },
   "dependencies": {
     "@ngneat/falso": "^7.2.0",
+    "@sensinum/strapi-plugin-mcp": "^1.1.0",
     "@strapi/plugin-cloud": "5.30.0",
     "@strapi/plugin-users-permissions": "5.30.0",
     "@strapi/strapi": "5.30.0",

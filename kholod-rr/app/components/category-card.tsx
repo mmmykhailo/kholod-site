@@ -18,7 +18,7 @@ export function CategoryCard({
     : "/placeholder-category.png";
 
   return (
-    <Link to={`/catalog/${category.slug}`}>
+    <Link className="flex" to={`/catalog/${category.slug}`}>
       <Card
         className={cn("overflow-hidden shadow-none", {
           "transition-shadow shadow hover:shadow-lg": variant === "default",
@@ -32,7 +32,7 @@ export function CategoryCard({
           />
         </div>
         <CardHeader>
-          <CardTitle className="line-clamp-1 pb-1">{category.name}</CardTitle>
+          <CardTitle className="line-clamp-2 pb-px">{category.name}</CardTitle>
           {variant !== "compact" && category.description && (
             <p className="line-clamp-2 text-sm text-muted-foreground">
               {category.description}
