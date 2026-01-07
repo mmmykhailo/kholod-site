@@ -45,7 +45,7 @@ export default function BlockRenderer({ block }: { block: unknown }) {
     case "shared.image-banner":
       return (
         <Container>
-          <ImageBannerBlock block={typedBlock} className="aspect-video" />
+          <ImageBannerBlock block={typedBlock} className="md:aspect-video" />
         </Container>
       );
     case "shared.hoverable-banners-grid":

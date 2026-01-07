@@ -1,0 +1,33 @@
+# VPS Deployment Configuration
+# Copy this file to .deploy-config and edit with your VPS details
+# cp .deploy-config.example .deploy-config
+
+# SSH Connection Details
+VPS_HOST="your-vps-ip-or-domain"        # e.g., 123.45.67.89 or vps.example.com
+VPS_USER="your-username"                # e.g., root or ubuntu
+VPS_PORT="22"                           # SSH port (default: 22)
+VPS_DEPLOY_PATH="/var/www/kholod-site" # Path on VPS where app will be deployed
+
+# SSH Key (optional, leave empty to use default ~/.ssh/id_rsa)
+SSH_KEY=""                              # e.g., ~/.ssh/my-vps-key or leave empty
+
+# Examples:
+# ---------
+#
+# Example 1: DigitalOcean droplet with default key
+# VPS_HOST="134.209.100.123"
+# VPS_USER="root"
+# VPS_PORT="22"
+# SSH_KEY=""
+#
+# Example 2: AWS EC2 with custom key
+# VPS_HOST="ec2-12-34-56-78.compute-1.amazonaws.com"
+# VPS_USER="ubuntu"
+# VPS_PORT="22"
+# SSH_KEY="~/.ssh/my-aws-key.pem"
+#
+# Example 3: Custom VPS with custom SSH port
+# VPS_HOST="vps.mycompany.com"
+# VPS_USER="deploy"
+# VPS_PORT="2222"
+# SSH_KEY="~/.ssh/vps_deploy_key"

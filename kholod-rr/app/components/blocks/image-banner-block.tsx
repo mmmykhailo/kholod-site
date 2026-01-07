@@ -43,12 +43,20 @@ export default function ImageBannerBlock({
   return block.url ? (
     <Link
       to={block.url}
-      className={clsx("relative overflow-hidden rounded-lg", className)}
+      className={clsx(
+        "relative overflow-hidden rounded-lg min-h-64",
+        className,
+      )}
     >
       {content}
     </Link>
   ) : (
-    <div className={clsx("relative overflow-hidden rounded-lg", className)}>
+    <div
+      className={clsx(
+        "relative overflow-hidden rounded-lg min-h-64",
+        className,
+      )}
+    >
       {content}
     </div>
   );

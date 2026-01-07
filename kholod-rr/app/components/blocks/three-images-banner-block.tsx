@@ -17,7 +17,7 @@ export default function ThreeImagesBannerBlock({
   const { firstBanner, secondBanner, thirdBanner } = block;
 
   return (
-    <div className="grid grid-cols-3 gap-4 w-full aspect-video">
+    <div className="grid grid-cols-3 gap-4 w-full md:aspect-video">
       {/* Left side - 2/3 width */}
       <ImageBannerBlock block={firstBanner} className="col-span-2" />
 
