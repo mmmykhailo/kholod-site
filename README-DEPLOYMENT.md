@@ -7,7 +7,9 @@ Deploy from your PC to VPS:
 ```bash
 # 1. Setup (first time only)
 cp .deploy-config.example .deploy-config
-nano .deploy-config  # Add your VPS IP and SSH details
+nano .deploy-config
+# Add your VPS IP, SSH details, and optionally your domain
+# If you set DOMAIN, Caddy will auto-configure HTTPS!
 
 # 2. Deploy
 ./deploy-remote.sh
@@ -19,7 +21,7 @@ Choose option 1 from the menu.
 
 - **deploy-remote.sh** - Deploy from your PC to VPS via SSH (interactive menu)
 - **deploy.sh** - Deploy script that runs on VPS
-- **nginx.conf** - Nginx reverse proxy configuration
+- **Caddyfile** - Caddy reverse proxy configuration (automatic HTTPS!)
 - **DEPLOY.md** - Full deployment documentation
 
 ## How It Works
@@ -31,18 +33,18 @@ Choose option 1 from the menu.
 
 ## After Deployment
 
-Without Nginx (direct port access):
+Without Caddy (direct port access):
 - Frontend: http://your-vps-ip:3006
 - Strapi Admin: http://your-vps-ip:1337/admin
 - Strapi API: http://your-vps-ip:1337/api
 
-With Nginx (recommended - all on port 80):
-- Frontend: http://yourdomain.com
-- Strapi Admin: http://yourdomain.com/admin
-- Strapi API: http://yourdomain.com/api
+With Caddy (recommended - automatic HTTPS):
+- Frontend: https://yourdomain.com
+- Strapi Admin: https://yourdomain.com/admin
+- Strapi API: https://yourdomain.com/api
 
-Setup Nginx reverse proxy (see DEPLOY.md for step-by-step instructions).
-For production, add SSL with certbot (automatic setup).
+Setup Caddy reverse proxy (see DEPLOY.md for step-by-step instructions).
+Caddy automatically handles SSL certificates with Let's Encrypt - no manual setup needed!
 
 ## Common Commands
 

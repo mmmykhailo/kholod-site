@@ -1,0 +1,26 @@
+pvh-zavisa.com, www.pvh-zavisa.com {
+    encode gzip
+
+    # Combined Strapi paths (Admin, API, and Uploads)
+    handle /admin* {
+        reverse_proxy localhost:1337
+    }
+    handle /navigation* {
+        reverse_proxy localhost:1337
+    }
+    handle /api* {
+        reverse_proxy localhost:1337
+    }
+    handle /uploads* {
+        reverse_proxy localhost:1337
+    }
+
+    # Catch-all for React frontend
+    handle {
+        reverse_proxy localhost:3006
+    }
+
+    log {
+        level INFO
+    }
+}

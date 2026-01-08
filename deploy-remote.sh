@@ -22,6 +22,7 @@ VPS_USER=""
 VPS_PORT="22"
 VPS_DEPLOY_PATH="/var/www/kholod-site"
 SSH_KEY=""
+DOMAIN=""
 
 # Print colored messages
 print_msg() {
@@ -216,9 +217,27 @@ setup_vps_directory() {
     }
 }
 
+# Configure Caddyfile with domain
+configure_caddyfile() {
+    if [ -n "$DOMAIN" ]; then
+        print_msg "Configuring Caddyfile with domain: $DOMAIN"
+
+        # Create a temporary Caddyfile with domain replaced
+        sed "s/yourdomain.com www.yourdomain.com/$DOMAIN/g" Caddyfile > Caddyfile.tmp
+        mv Caddyfile.tmp Caddyfile
+
+        print_info "Caddyfile configured for: $DOMAIN"
+    else
+        print_info "No DOMAIN set in config - Caddyfile will use placeholder"
+    fi
+}
+
 # Sync files to VPS
 sync_files() {
     print_msg "Syncing files to VPS..."
+
+    # Configure Caddyfile before syncing
+    configure_caddyfile
 
     # Create .rsyncignore if it doesn't exist
     if [ ! -f ".rsyncignore" ]; then
@@ -376,9 +395,9 @@ view_logs() {
     $ssh_cmd "pm2 logs"
 }
 
-# Setup Nginx on VPS
-setup_nginx() {
-    print_msg "Setting up Nginx on VPS..."
+# Setup Caddy on VPS
+setup_caddy() {
+    print_msg "Setting up Caddy on VPS..."
 
     local ssh_cmd=$(build_ssh_cmd)
 
@@ -387,54 +406,78 @@ setup_nginx() {
         detect_os
     fi
 
-    # Install Nginx if not present
-    if ! $ssh_cmd "command -v nginx" > /dev/null 2>&1; then
-        print_info "Installing Nginx..."
-        $ssh_cmd "$PKG_UPDATE && $PKG_INSTALL nginx"
+    # Install Caddy if not present
+    if ! $ssh_cmd "command -v caddy" > /dev/null 2>&1; then
+        print_info "Installing Caddy..."
 
-        # Start and enable nginx
-        $ssh_cmd "sudo systemctl enable nginx && sudo systemctl start nginx"
-    fi
+        if [ "$OS_TYPE" = "debian" ]; then
+            # Debian/Ubuntu
+            $ssh_cmd "sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl && \
+                      curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg && \
+                      curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list && \
+                      $PKG_UPDATE && \
+                      $PKG_INSTALL caddy"
+        else
+            # RHEL/AlmaLinux/Fedora
+            $ssh_cmd "dnf install 'dnf-command(copr)' -y && \
+                      dnf copr enable @caddy/caddy -y && \
+                      $PKG_INSTALL caddy"
+        fi
 
-    # Copy nginx config based on OS type
-    print_info "Uploading Nginx configuration..."
+        # Start and enable caddy
+        $ssh_cmd "sudo systemctl enable caddy && sudo systemctl start caddy"
 
-    if [ "$OS_TYPE" = "debian" ]; then
-        # Debian/Ubuntu uses sites-available/sites-enabled
-        $ssh_cmd "sudo cp $VPS_DEPLOY_PATH/nginx.conf /etc/nginx/sites-available/kholod-site"
-
-        print_msg "Next steps:"
-        print_warning "1. Edit nginx config with your domain/IP:"
-        print_warning "   sudo nano /etc/nginx/sites-available/kholod-site"
-        print_warning "   (Replace 'yourdomain.com' with your domain or server IP)"
-        print_warning ""
-        print_warning "2. Enable the site:"
-        print_warning "   sudo ln -s /etc/nginx/sites-available/kholod-site /etc/nginx/sites-enabled/"
-        print_warning "   sudo rm /etc/nginx/sites-enabled/default"
-        print_warning "   sudo nginx -t"
-        print_warning "   sudo systemctl restart nginx"
-        print_warning ""
-        print_warning "3. (Optional) Add SSL with Let's Encrypt:"
-        print_warning "   $PKG_INSTALL certbot python3-certbot-nginx"
-        print_warning "   sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com"
+        print_msg "Caddy installed!"
     else
-        # RHEL/AlmaLinux uses conf.d
-        $ssh_cmd "sudo cp $VPS_DEPLOY_PATH/nginx.conf /etc/nginx/conf.d/kholod-site.conf"
-
-        print_msg "Next steps:"
-        print_warning "1. Edit nginx config with your domain/IP:"
-        print_warning "   sudo nano /etc/nginx/conf.d/kholod-site.conf"
-        print_warning "   (Replace 'yourdomain.com' with your domain or server IP)"
-        print_warning ""
-        print_warning "2. Configure SELinux and restart nginx:"
-        print_warning "   sudo setsebool -P httpd_can_network_connect 1"
-        print_warning "   sudo nginx -t"
-        print_warning "   sudo systemctl restart nginx"
-        print_warning ""
-        print_warning "3. (Optional) Add SSL with Let's Encrypt:"
-        print_warning "   $PKG_INSTALL certbot python3-certbot-nginx"
-        print_warning "   sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com"
+        print_msg "Caddy is already installed"
     fi
+
+    # Copy Caddyfile
+    print_info "Uploading Caddyfile configuration..."
+    $ssh_cmd "sudo cp $VPS_DEPLOY_PATH/Caddyfile /etc/caddy/Caddyfile"
+
+    print_msg ""
+    print_msg "=== Caddy Setup ==="
+
+    if [ -n "$DOMAIN" ]; then
+        print_msg "Domain configured: $DOMAIN"
+        print_info "Caddyfile is already configured with your domain!"
+        print_warning ""
+        print_warning "1. Validate the configuration:"
+        print_warning "   sudo caddy validate --config /etc/caddy/Caddyfile"
+        print_warning ""
+        print_warning "2. Restart Caddy:"
+        print_warning "   sudo systemctl restart caddy"
+        print_warning ""
+        print_warning "Caddy will automatically:"
+        print_warning "  ✓ Get SSL certificates from Let's Encrypt for $DOMAIN"
+        print_warning "  ✓ Redirect HTTP to HTTPS"
+        print_warning "  ✓ Renew certificates automatically"
+        print_warning ""
+        print_info "Your site will be available at: https://$DOMAIN"
+    else
+        print_warning "No domain configured in .deploy-config"
+        print_warning ""
+        print_warning "1. Edit the Caddyfile with your domain:"
+        print_warning "   sudo nano /etc/caddy/Caddyfile"
+        print_warning "   Replace 'yourdomain.com' with your actual domain"
+        print_warning ""
+        print_warning "2. Validate the configuration:"
+        print_warning "   sudo caddy validate --config /etc/caddy/Caddyfile"
+        print_warning ""
+        print_warning "3. Restart Caddy:"
+        print_warning "   sudo systemctl restart caddy"
+        print_warning ""
+        print_warning "For IP-only access (no domain), uncomment the HTTP-only section in Caddyfile"
+    fi
+
+    if [ "$OS_TYPE" = "rhel" ]; then
+        print_warning ""
+        print_warning "For RHEL/AlmaLinux, also run:"
+        print_warning "   sudo setsebool -P httpd_can_network_connect 1"
+    fi
+
+    print_msg "==================="
 }
 
 # Main menu
@@ -447,7 +490,7 @@ show_menu() {
     echo "1) Full Deploy (sync files + deploy)"
     echo "2) Sync files only"
     echo "3) Run deployment only (use existing files)"
-    echo "4) Setup Nginx"
+    echo "4) Setup Caddy (reverse proxy)"
     echo "5) View deployment status"
     echo "6) View logs"
     echo "7) Open SSH session"
@@ -460,7 +503,7 @@ show_menu() {
         1) full_deploy ;;
         2) sync_files ;;
         3) run_deployment && show_status ;;
-        4) setup_nginx ;;
+        4) setup_caddy ;;
         5) show_status ;;
         6) view_logs ;;
         7) open_ssh_session ;;
@@ -491,9 +534,9 @@ full_deploy() {
     print_msg "═══════════════════════════════════════"
     echo ""
     print_warning "Next steps:"
-    print_warning "1. Setup Nginx reverse proxy (option 4 in menu)"
+    print_warning "1. Setup Caddy reverse proxy (option 4 in menu)"
     print_warning "2. Create Strapi admin user at /admin"
-    print_warning "3. (Optional) Add SSL with certbot for HTTPS"
+    print_warning "   Caddy will automatically handle HTTPS with Let's Encrypt!"
     echo ""
 }
 

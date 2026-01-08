@@ -61,7 +61,10 @@ VPS_USER="root"                      # SSH user
 VPS_PORT="22"                        # SSH port
 VPS_DEPLOY_PATH="/var/www/kholod-site"
 SSH_KEY=""                           # Optional SSH key path
+DOMAIN="example.com"                 # Optional domain (auto-configures Caddy HTTPS)
 ```
+
+If you set `DOMAIN`, the deployment script will automatically configure Caddyfile with your domain and enable HTTPS.
 
 ### Environment Variables
 
@@ -84,99 +87,69 @@ VITE_STRAPI_URL=http://localhost:1337
 
 ## After Deployment
 
-### Setup Nginx Reverse Proxy
+### Setup Caddy Reverse Proxy
 
-The deployment script automatically detects your OS. Follow the instructions for your system:
+Caddy automatically handles HTTPS with Let's Encrypt - no manual SSL setup needed!
 
-#### Debian/Ubuntu
+#### Option 1: Automatic Setup (Recommended)
 
 ```bash
-# SSH to VPS
-ssh user@your-vps
-
-# Copy nginx config
-sudo cp /var/www/kholod-site/nginx.conf /etc/nginx/sites-available/kholod-site
-
-# Edit with your domain or IP
-sudo nano /etc/nginx/sites-available/kholod-site
-# Replace "yourdomain.com www.yourdomain.com" with your actual domain or server IP
-
-# Enable site
-sudo ln -s /etc/nginx/sites-available/kholod-site /etc/nginx/sites-enabled/
-sudo rm /etc/nginx/sites-enabled/default  # Remove default nginx page
-sudo nginx -t
-sudo systemctl restart nginx
+# From your PC
+./deploy-remote.sh
+# Choose option 4 (Setup Caddy)
 ```
 
-#### AlmaLinux/RHEL/CentOS
+Then follow the on-screen instructions.
+
+#### Option 2: Manual Setup
 
 ```bash
 # SSH to VPS
 ssh user@your-vps
 
-# Copy nginx config
-sudo cp /var/www/kholod-site/nginx.conf /etc/nginx/conf.d/kholod-site.conf
+# Copy Caddyfile
+sudo cp /var/www/kholod-site/Caddyfile /etc/caddy/Caddyfile
 
-# Edit with your domain or IP
-sudo nano /etc/nginx/conf.d/kholod-site.conf
-# Replace "yourdomain.com www.yourdomain.com" with your actual domain or server IP
+# Edit with your domain
+sudo nano /etc/caddy/Caddyfile
+# Replace "yourdomain.com www.yourdomain.com" with your actual domain
 
-# Test and restart
-sudo nginx -t
-sudo systemctl restart nginx
+# Validate configuration
+sudo caddy validate --config /etc/caddy/Caddyfile
 
-# Configure SELinux to allow proxy connections
+# Restart Caddy
+sudo systemctl restart caddy
+```
+
+**For AlmaLinux/RHEL/CentOS only:**
+```bash
+# Allow Caddy to connect to backend services
 sudo setsebool -P httpd_can_network_connect 1
 ```
 
-Your site should now be accessible at:
-- **Frontend**: http://yourdomain.com (or http://your-server-ip)
-- **Strapi Admin**: http://yourdomain.com/admin
-- **Strapi API**: http://yourdomain.com/api
+**For IP-only access (no domain):**
+Edit `/etc/caddy/Caddyfile` and uncomment the HTTP-only section, replacing the domain section.
 
-### Setup SSL (Optional but Recommended for Production)
+That's it! Caddy will automatically:
+- ✅ Get SSL certificates from Let's Encrypt
+- ✅ Redirect HTTP to HTTPS
+- ✅ Renew certificates automatically
+- ✅ Handle all proxy configuration
 
-Once your site is working over HTTP, add SSL/HTTPS:
-
-#### Debian/Ubuntu
-```bash
-# Install certbot
-sudo apt install certbot python3-certbot-nginx
-
-# Get SSL certificate (certbot will automatically configure nginx)
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
-
-# Certbot will ask for your email and automatically:
-# - Obtain SSL certificates from Let's Encrypt
-# - Update your nginx config to use HTTPS
-# - Set up automatic certificate renewal
-```
-
-#### AlmaLinux/RHEL/CentOS
-```bash
-# Install certbot
-sudo dnf install certbot python3-certbot-nginx
-
-# Get SSL certificate (certbot will automatically configure nginx)
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
-
-# Certbot will ask for your email and automatically:
-# - Obtain SSL certificates from Let's Encrypt
-# - Update your nginx config to use HTTPS
-# - Set up automatic certificate renewal
-```
-
-After SSL setup, your site will be accessible at:
-- **Frontend**: https://yourdomain.com
+Your site will be accessible at:
+- **Frontend**: https://yourdomain.com (HTTP auto-redirects to HTTPS)
 - **Strapi Admin**: https://yourdomain.com/admin
 - **Strapi API**: https://yourdomain.com/api
+
+**Note:** First time SSL setup may take 1-2 minutes. Check status: `sudo systemctl status caddy`
 
 ### Configure Firewall
 
 #### Debian/Ubuntu (UFW)
 ```bash
 sudo ufw allow OpenSSH
-sudo ufw allow 'Nginx Full'
+sudo ufw allow 80/tcp   # HTTP
+sudo ufw allow 443/tcp  # HTTPS
 sudo ufw enable
 ```
 
@@ -199,7 +172,7 @@ sudo firewall-cmd --reload
 # 1) Full Deploy - Sync files and deploy
 # 2) Sync files only
 # 3) Deploy only (using existing files)
-# 4) Setup Nginx
+# 4) Setup Caddy (reverse proxy with auto-HTTPS)
 # 5) View deployment status
 # 6) View logs
 # 7) Open SSH session
@@ -342,23 +315,23 @@ tar -czf ~/uploads-backup.tar.gz /var/www/kholod-site/kholod-strapi/public/uploa
 - Frontend: 3006
 - Strapi Backend/Admin: 1337
 
-**Nginx Ports:**
+**Caddy Ports:**
 - HTTP: 80
-- HTTPS: 443 (after SSL setup)
+- HTTPS: 443 (automatic with domain)
 
 **Access URLs:**
 
-Before Nginx setup:
+Before Caddy setup:
 - Frontend: http://your-server-ip:3006
 - Strapi Admin: http://your-server-ip:1337/admin
 - Strapi API: http://your-server-ip:1337/api
 
-After Nginx setup (HTTP):
-- Frontend: http://yourdomain.com
-- Strapi Admin: http://yourdomain.com/admin
-- Strapi API: http://yourdomain.com/api
-
-After SSL setup (HTTPS):
+After Caddy setup (automatic HTTPS):
 - Frontend: https://yourdomain.com
 - Strapi Admin: https://yourdomain.com/admin
 - Strapi API: https://yourdomain.com/api
+
+IP-only access (HTTP):
+- Frontend: http://your-server-ip
+- Strapi Admin: http://your-server-ip/admin
+- Strapi API: http://your-server-ip/api

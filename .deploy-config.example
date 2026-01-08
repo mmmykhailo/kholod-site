@@ -11,6 +11,16 @@ VPS_DEPLOY_PATH="/var/www/kholod-site" # Path on VPS where app will be deployed
 # SSH Key (optional, leave empty to use default ~/.ssh/id_rsa)
 SSH_KEY=""                              # e.g., ~/.ssh/my-vps-key or leave empty
 
+# Domain Configuration (for automatic Caddy setup)
+DOMAIN=""                               # e.g., example.com (Caddy will auto-configure HTTPS)
+# Leave empty to use IP-only access (HTTP) or configure domain manually later
+# If set, the deployment will automatically:
+#   - Configure Caddyfile with your domain
+#   - Enable automatic HTTPS with Let's Encrypt
+# Examples:
+#   DOMAIN="example.com"                # Single domain
+#   DOMAIN="example.com www.example.com" # Multiple domains
+
 # Examples:
 # ---------
 #
