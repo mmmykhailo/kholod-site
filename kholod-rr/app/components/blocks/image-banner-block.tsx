@@ -33,7 +33,7 @@ export default function ImageBannerBlock({
           className="absolute inset-0 object-cover object-center w-full h-full"
         />
       )}
-      <div className="relative min-h-full bg-linear-to-t from-black/60 to-transparent flex flex-col justify-end p-6 text-white">
+      <div className="relative min-h-full min-w-full bg-linear-to-t from-black/60 to-transparent flex flex-col justify-end p-6 text-white">
         <h2 className="text-3xl font-bold mb-2">{block.title}</h2>
         <p className="text-lg">{block.description}</p>
       </div>
@@ -44,7 +44,7 @@ export default function ImageBannerBlock({
     <Link
       to={block.url}
       className={clsx(
-        "relative overflow-hidden rounded-lg min-h-64",
+        "flex relative overflow-hidden rounded-lg min-h-64",
         className,
       )}
     >
@@ -53,7 +53,7 @@ export default function ImageBannerBlock({
   ) : (
     <div
       className={clsx(
-        "relative overflow-hidden rounded-lg min-h-64",
+        "flex relative overflow-hidden rounded-lg min-h-64",
         className,
       )}
     >

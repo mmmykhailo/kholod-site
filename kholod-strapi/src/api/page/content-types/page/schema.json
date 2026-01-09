@@ -54,6 +54,15 @@
       "target": "api::page.page",
       "inversedBy": "childrenPages"
     },
+    "showPageTitle": {
+      "type": "boolean",
+      "default": false,
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
     "blocks": {
       "type": "dynamiczone",
       "pluginOptions": {

@@ -9,6 +9,7 @@ export type Page = {
   documentId: string;
   title: string;
   slug: string;
+  showPageTitle: boolean;
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;

@@ -8,6 +8,18 @@ pvh-zavisa.com, www.pvh-zavisa.com {
     handle /navigation* {
         reverse_proxy localhost:1337
     }
+    handle /i18n* {
+        reverse_proxy localhost:1337
+    }
+    handle /uploads* {
+        reverse_proxy localhost:1337
+    }
+    handle /upload* {
+        reverse_proxy localhost:1337
+    }
+    handle /content-manager* {
+        reverse_proxy localhost:1337
+    }
     handle /api* {
         reverse_proxy localhost:1337
     }
