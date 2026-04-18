@@ -28,6 +28,20 @@
       "component": "calculator.cornice-type",
       "repeatable": true,
       "required": true
+    },
+    "defaultOverlap": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "description": "Pre-selected overlap value in mm when the form loads"
+    },
+    "defaultPlankType": {
+      "type": "string",
+      "description": "Slug of the plank type pre-selected when the form loads"
+    },
+    "defaultCorniceType": {
+      "type": "string",
+      "description": "Slug of the cornice type pre-selected when the form loads"
     }
   }
 }

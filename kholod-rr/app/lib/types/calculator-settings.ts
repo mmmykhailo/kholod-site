@@ -28,6 +28,9 @@ export type RegularCalculatorSettings = {
   overlapOptions: number[];
   plankTypes: PlankType[];
   corniceTypes: CorniceType[];
+  defaultOverlap: number;
+  defaultPlankType: string | null;
+  defaultCorniceType: string | null;
 };
 
 export type MagnetCalculatorSettings = {

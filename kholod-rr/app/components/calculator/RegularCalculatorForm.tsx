@@ -30,6 +30,10 @@ export default function RegularCalculatorForm({ settings }: Props) {
     (pt) => pt.stripWidth === selectedStripWidth,
   );
 
+  const defaultPlankSlug =
+    availablePlankTypes.find((pt) => pt.slug === settings.defaultPlankType)?.slug ??
+    availablePlankTypes[0]?.slug;
+
   return (
     <Form method="post">
       <FieldGroup>
@@ -81,7 +85,7 @@ export default function RegularCalculatorForm({ settings }: Props) {
           <Field>
             <FieldLabel htmlFor="overlap">Нахлист (мм)</FieldLabel>
             <FieldContent>
-              <Select name="overlap" defaultValue="0">
+              <Select name="overlap" defaultValue={settings.defaultOverlap.toString()}>
                 <SelectTrigger id="overlap">
                   <SelectValue />
                 </SelectTrigger>
@@ -120,7 +124,7 @@ export default function RegularCalculatorForm({ settings }: Props) {
             <FieldContent>
               <Select
                 name="corniceType"
-                defaultValue={settings.corniceTypes[0]?.slug}
+                defaultValue={settings.defaultCorniceType ?? settings.corniceTypes[0]?.slug}
               >
                 <SelectTrigger id="corniceType">
                   <SelectValue />
@@ -141,7 +145,7 @@ export default function RegularCalculatorForm({ settings }: Props) {
             <FieldContent>
               <Select
                 name="plankType"
-                defaultValue={availablePlankTypes[0]?.slug}
+                defaultValue={defaultPlankSlug}
                 key={selectedStripType}
               >
                 <SelectTrigger id="plankType">

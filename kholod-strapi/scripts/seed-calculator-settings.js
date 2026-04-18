@@ -35,6 +35,9 @@ const DATA = {
         itemFractionToCeil: 0.5,
       },
     ],
+    defaultOverlap: 0,
+    defaultPlankType: "200-stainless",
+    defaultCorniceType: "cornice-stainless",
   },
   magnetCalculator: {
     stripTypes: STRIP_TYPES,

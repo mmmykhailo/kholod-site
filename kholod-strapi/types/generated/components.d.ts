@@ -62,6 +62,11 @@ export interface CalculatorRegularCalculatorSettings
   attributes: {
     corniceTypes: Schema.Attribute.Component<'calculator.cornice-type', true> &
       Schema.Attribute.Required;
+    defaultCorniceType: Schema.Attribute.String;
+    defaultOverlap: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<0>;
+    defaultPlankType: Schema.Attribute.String;
     overlapOptions: Schema.Attribute.JSON & Schema.Attribute.Required;
     plankTypes: Schema.Attribute.Component<'calculator.plank-type', true> &
       Schema.Attribute.Required;
