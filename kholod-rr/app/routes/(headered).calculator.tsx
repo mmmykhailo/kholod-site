@@ -79,10 +79,14 @@ export default function Calculator() {
                     <TabsTrigger value="magnet">Магнітні штори</TabsTrigger>
                   </TabsList>
                   <TabsContent value="regular">
-                    <RegularCalculatorForm settings={settings.regularCalculator} />
+                    <RegularCalculatorForm
+                      settings={settings.regularCalculator}
+                    />
                   </TabsContent>
                   <TabsContent value="magnet">
-                    <MagnetCalculatorForm settings={settings.magnetCalculator} />
+                    <MagnetCalculatorForm
+                      settings={settings.magnetCalculator}
+                    />
                   </TabsContent>
                 </Tabs>
               </CardContent>
@@ -132,7 +136,7 @@ export default function Calculator() {
 
                     <ItemSeparator />
 
-                    <Item>
+                    {/*<Item>
                       <ItemContent>
                         <ItemTitle>Вартість стрічки</ItemTitle>
                         <div className="text-xs text-muted-foreground">
@@ -147,7 +151,7 @@ export default function Calculator() {
                       </ItemContent>
                     </Item>
 
-                    <ItemSeparator />
+                    <ItemSeparator />*/}
 
                     <Item>
                       <ItemContent>
@@ -160,7 +164,7 @@ export default function Calculator() {
 
                     <ItemSeparator />
 
-                    <Item>
+                    {/*<Item>
                       <ItemContent>
                         <ItemTitle>Вартість планок</ItemTitle>
                         <div className="text-xs text-muted-foreground">
@@ -175,9 +179,9 @@ export default function Calculator() {
                       </ItemContent>
                     </Item>
 
-                    <ItemSeparator />
+                    <ItemSeparator />*/}
 
-                    <Item>
+                    {/*<Item>
                       <ItemContent>
                         <ItemTitle>Вартість карнізу</ItemTitle>
                         <div className="text-xs text-muted-foreground">
@@ -193,7 +197,7 @@ export default function Calculator() {
                       </ItemContent>
                     </Item>
 
-                    <ItemSeparator />
+                    <ItemSeparator />*/}
 
                     <Item variant="muted">
                       <ItemContent>
