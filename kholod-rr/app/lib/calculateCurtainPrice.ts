@@ -1,7 +1,4 @@
-import {
-  regularCalculator,
-  magnetCalculator,
-} from "~/lib/constants/calculator";
+import type { CalculatorSettings } from "~/lib/types/calculator-settings";
 
 function metersToCornicePieces(value: number): number {
   if (value <= 1.25) return 1;
@@ -63,6 +60,7 @@ export interface CalculationInput {
 
 export function calculateCurtainPrice(
   input: CalculationInput,
+  settings: CalculatorSettings,
 ): CalculationResult {
   const {
     width,
@@ -74,12 +72,14 @@ export function calculateCurtainPrice(
     plankType,
   } = input;
 
-  // Get strip type data and extract width (same for both calculators)
-  const stripTypeData = regularCalculator.stripTypes.find(
-    (st) => st.value === stripType,
-  );
-  const stripWidth = stripTypeData?.width || 200;
-  const ribbonPricePerMeter = stripTypeData?.pricePerMeter || 0;
+  const allStripTypes = [
+    ...settings.regularCalculator.stripTypes,
+    ...settings.magnetCalculator.stripTypes,
+  ];
+
+  const stripTypeData = allStripTypes.find((st) => st.slug === stripType);
+  const stripWidth = stripTypeData?.width ?? 200;
+  const ribbonPricePerMeter = stripTypeData?.pricePerMeter ?? 0;
 
   // Calculate number of strips
   const effectiveStripWidth = stripWidth - overlap;
@@ -103,34 +103,22 @@ export function calculateCurtainPrice(
 
   // Calculate planks price
   const numberOfPlanks = numberOfStrips;
-  let plankPricePerPiece = 0;
 
-  // Try to find plank in regular calculator first, then magnetic calculator
-  let plankData = regularCalculator.plankTypes.find(
-    (pt) => pt.value === plankType,
-  );
-
-  if (!plankData) {
-    plankData = magnetCalculator.plankTypes.find(
-      (pt) => pt.value === plankType,
-    );
-  }
-
-  plankPricePerPiece = plankData?.price || 0;
+  const allPlankTypes = [
+    ...settings.regularCalculator.plankTypes,
+    ...settings.magnetCalculator.plankTypes,
+  ];
+  const plankData = allPlankTypes.find((pt) => pt.slug === plankType);
+  const plankPricePerPiece = plankData?.price ?? 0;
   const planksPrice = numberOfPlanks * plankPricePerPiece;
 
   // Calculate cornice price
-  let cornicePricePerItem = 0;
-
-  // Check if using magnet calculator (алюміній)
-  if (corniceType === magnetCalculator.corniceType.value) {
-    cornicePricePerItem = magnetCalculator.corniceType.pricePerItem;
-  } else {
-    const corniceData = regularCalculator.corniceTypes.find(
-      (ct) => ct.value === corniceType,
-    );
-    cornicePricePerItem = corniceData?.pricePerItem || 0;
-  }
+  const allCorniceTypes = [
+    ...settings.regularCalculator.corniceTypes,
+    settings.magnetCalculator.corniceType,
+  ];
+  const corniceData = allCorniceTypes.find((ct) => ct.slug === corniceType);
+  const cornicePricePerItem = corniceData?.pricePerItem ?? 0;
 
   const corniceMeters = width / 1000;
   const numberOfCorniceItems = metersToCornicePieces(corniceMeters);

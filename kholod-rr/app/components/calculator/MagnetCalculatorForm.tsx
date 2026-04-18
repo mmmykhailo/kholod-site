@@ -10,21 +10,23 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Button } from "../ui/button";
-import { magnetCalculator } from "~/lib/constants/calculator";
+import type { MagnetCalculatorSettings } from "~/lib/types/calculator-settings";
 
-export default function MagnetCalculatorForm() {
+interface Props {
+  settings: MagnetCalculatorSettings;
+}
+
+export default function MagnetCalculatorForm({ settings }: Props) {
   const [selectedStripType, setSelectedStripType] = useState<string>(
-    magnetCalculator.stripTypes[0].value,
+    settings.stripTypes[0]?.slug ?? "",
   );
 
-  // Get the strip width for the selected strip type
-  const selectedStripData = magnetCalculator.stripTypes.find(
-    (st) => st.value === selectedStripType,
+  const selectedStripData = settings.stripTypes.find(
+    (st) => st.slug === selectedStripType,
   );
-  const selectedStripWidth = selectedStripData?.width || 200;
+  const selectedStripWidth = selectedStripData?.width ?? 200;
 
-  // Filter plank types by strip width
-  const availablePlankTypes = magnetCalculator.plankTypes.filter(
+  const availablePlankTypes = settings.plankTypes.filter(
     (pt) => pt.stripWidth === selectedStripWidth,
   );
 
@@ -65,8 +67,8 @@ export default function MagnetCalculatorForm() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {magnetCalculator.stripTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
+                {settings.stripTypes.map((type) => (
+                  <SelectItem key={type.slug} value={type.slug}>
                     {type.label}
                   </SelectItem>
                 ))}
@@ -76,22 +78,22 @@ export default function MagnetCalculatorForm() {
         </Field>
       </FieldGroup>
 
-      {/* Hidden fields with default values */}
-      <input type="hidden" name="overlap" value={magnetCalculator.overlap} />
+      {/* Hidden fields with default values from Strapi */}
+      <input type="hidden" name="overlap" value={settings.defaultOverlap} />
       <input
         type="hidden"
         name="addExtraStrip"
-        value={magnetCalculator.addExtraStrip.toString()}
+        value={settings.addExtraStrip.toString()}
       />
       <input
         type="hidden"
         name="corniceType"
-        value={magnetCalculator.corniceType.value}
+        value={settings.corniceType.slug}
       />
       <input
         type="hidden"
-        name="plankId"
-        value={availablePlankTypes[0]?.value}
+        name="plankType"
+        value={availablePlankTypes[0]?.slug ?? ""}
       />
 
       <Button type="submit" className="mt-6 w-full">

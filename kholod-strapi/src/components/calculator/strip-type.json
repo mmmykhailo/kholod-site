@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_calculator_strip_types",
+  "info": {
+    "displayName": "Strip Type",
+    "description": "A PVC strip with width and price per meter"
+  },
+  "options": {},
+  "attributes": {
+    "slug": {
+      "type": "string",
+      "required": true,
+      "description": "Unique ID, e.g. 200x1.7. Do not change after setup."
+    },
+    "label": {
+      "type": "string",
+      "required": true,
+      "description": "Display name, e.g. 200\u00d71.7"
+    },
+    "width": {
+      "type": "integer",
+      "required": true,
+      "description": "Strip width in mm (e.g. 200 or 300)"
+    },
+    "pricePerMeter": {
+      "type": "decimal",
+      "required": true,
+      "description": "Price per meter in UAH"
+    }
+  }
+}

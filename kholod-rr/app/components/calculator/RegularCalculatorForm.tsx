@@ -9,22 +9,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { regularCalculator } from "~/lib/constants/calculator";
 import { Button } from "../ui/button";
+import type { RegularCalculatorSettings } from "~/lib/types/calculator-settings";
 
-export default function RegularCalculatorForm() {
+interface Props {
+  settings: RegularCalculatorSettings;
+}
+
+export default function RegularCalculatorForm({ settings }: Props) {
   const [selectedStripType, setSelectedStripType] = useState<string>(
-    regularCalculator.stripTypes[0].value,
+    settings.stripTypes[0]?.slug ?? "",
   );
 
-  // Get the strip width for the selected strip type
-  const selectedStripData = regularCalculator.stripTypes.find(
-    (st) => st.value === selectedStripType,
+  const selectedStripData = settings.stripTypes.find(
+    (st) => st.slug === selectedStripType,
   );
-  const selectedStripWidth = selectedStripData?.width || 200;
+  const selectedStripWidth = selectedStripData?.width ?? 200;
 
-  // Filter plank types by strip width
-  const availablePlankTypes = regularCalculator.plankTypes.filter(
+  const availablePlankTypes = settings.plankTypes.filter(
     (pt) => pt.stripWidth === selectedStripWidth,
   );
 
@@ -65,8 +67,8 @@ export default function RegularCalculatorForm() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {regularCalculator.stripTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
+                {settings.stripTypes.map((type) => (
+                  <SelectItem key={type.slug} value={type.slug}>
                     {type.label}
                   </SelectItem>
                 ))}
@@ -84,7 +86,7 @@ export default function RegularCalculatorForm() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {regularCalculator.overlapOptions.map((overlap) => (
+                  {settings.overlapOptions.map((overlap) => (
                     <SelectItem key={overlap} value={overlap.toString()}>
                       {overlap} мм
                     </SelectItem>
@@ -118,14 +120,14 @@ export default function RegularCalculatorForm() {
             <FieldContent>
               <Select
                 name="corniceType"
-                defaultValue={regularCalculator.corniceTypes[0].value}
+                defaultValue={settings.corniceTypes[0]?.slug}
               >
                 <SelectTrigger id="corniceType">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {regularCalculator.corniceTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
+                  {settings.corniceTypes.map((type) => (
+                    <SelectItem key={type.slug} value={type.slug}>
                       {type.label}
                     </SelectItem>
                   ))}
@@ -139,7 +141,7 @@ export default function RegularCalculatorForm() {
             <FieldContent>
               <Select
                 name="plankType"
-                defaultValue={availablePlankTypes[0]?.value}
+                defaultValue={availablePlankTypes[0]?.slug}
                 key={selectedStripType}
               >
                 <SelectTrigger id="plankType">
@@ -147,7 +149,7 @@ export default function RegularCalculatorForm() {
                 </SelectTrigger>
                 <SelectContent>
                   {availablePlankTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
+                    <SelectItem key={type.slug} value={type.slug}>
                       {type.label}
                     </SelectItem>
                   ))}

@@ -11,6 +11,7 @@
     "develop": "strapi develop",
     "seed:test-catalog": "node ./scripts/seed-test-catalog.js",
     "seed:pvc-curtains": "node ./scripts/seed-pvc-curtains.js",
+    "seed:calculator-settings": "node ./scripts/seed-calculator-settings.js",
     "start": "strapi start",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",

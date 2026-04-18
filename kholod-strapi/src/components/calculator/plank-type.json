@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_calculator_plank_types",
+  "info": {
+    "displayName": "Plank Type",
+    "description": "A mounting plank with material, compatible strip width, and price per piece"
+  },
+  "options": {},
+  "attributes": {
+    "slug": {
+      "type": "string",
+      "required": true,
+      "description": "Unique ID, e.g. 200-stainless. Do not change after setup."
+    },
+    "label": {
+      "type": "string",
+      "required": true,
+      "description": "Material name, e.g. \u041d\u0435\u0440\u0436\u0430\u0432\u0456\u0439\u043a\u0430"
+    },
+    "stripWidth": {
+      "type": "integer",
+      "required": true,
+      "description": "Compatible strip width in mm (must match a strip type width)"
+    },
+    "price": {
+      "type": "decimal",
+      "required": true,
+      "description": "Price per piece in UAH"
+    }
+  }
+}

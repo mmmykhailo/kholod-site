@@ -8,7 +8,8 @@
       "mcp__strapi__get-components",
       "mcp__strapi__get-services",
       "mcp__strapi__get-service-methods",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(bun run:*)"
     ],
     "deny": [],
     "ask": []

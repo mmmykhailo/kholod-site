@@ -3,6 +3,7 @@ import type { Page } from "./types/page";
 import type { MainNavigationItems } from "./types/main-navigation";
 import type { CategoriesResponse, Category } from "./types/category";
 import type { ProductsResponse, Product } from "./types/product";
+import type { CalculatorSettings } from "./types/calculator-settings";
 import { strapiUrl } from "./urls";
 
 const baseURL = `${strapiUrl}/api`;
@@ -118,4 +119,24 @@ export async function fetchProductBySlug(slug: string) {
   const product: Product = await response.json();
 
   return product;
+}
+
+export async function fetchCalculatorSettings(): Promise<CalculatorSettings | null> {
+  const populate =
+    "populate[regularCalculator][populate][stripTypes]=true" +
+    "&populate[regularCalculator][populate][plankTypes]=true" +
+    "&populate[regularCalculator][populate][corniceTypes]=true" +
+    "&populate[magnetCalculator][populate][stripTypes]=true" +
+    "&populate[magnetCalculator][populate][plankTypes]=true" +
+    "&populate[magnetCalculator][populate][corniceType]=true";
+
+  const response = await fetch(`${baseURL}/calculator-settings?${populate}`);
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const json = await response.json();
+
+  return json.data;
 }

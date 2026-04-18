@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_calculator_cornice_types",
+  "info": {
+    "displayName": "Cornice Type",
+    "description": "A cornice (curtain rod) option with pricing"
+  },
+  "options": {},
+  "attributes": {
+    "slug": {
+      "type": "string",
+      "required": true,
+      "description": "Unique ID, e.g. stainless. Do not change after setup."
+    },
+    "label": {
+      "type": "string",
+      "required": true,
+      "description": "Display name, e.g. \u041d\u0435\u0440\u0436\u0430\u0432\u0456\u0439\u043a\u0430"
+    },
+    "pricePerItem": {
+      "type": "decimal",
+      "required": true,
+      "description": "Price per piece in UAH"
+    },
+    "itemLength": {
+      "type": "decimal",
+      "required": true,
+      "description": "Length of one cornice piece in meters (e.g. 1.25)"
+    },
+    "itemFractionToCeil": {
+      "type": "decimal",
+      "required": true,
+      "description": "Rounding step for partial pieces (e.g. 0.5 means round up to nearest 0.5)"
+    }
+  }
+}

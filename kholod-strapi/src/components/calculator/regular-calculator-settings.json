@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_calculator_regular_settings",
+  "info": {
+    "displayName": "Regular Calculator Settings",
+    "description": "All options for the standard curtain calculator"
+  },
+  "options": {},
+  "attributes": {
+    "stripTypes": {
+      "type": "component",
+      "component": "calculator.strip-type",
+      "repeatable": true,
+      "required": true
+    },
+    "overlapOptions": {
+      "type": "json",
+      "required": true,
+      "description": "Array of allowed overlap values in mm, e.g. [0, 25, 50, 75, 100, 125, 150]"
+    },
+    "plankTypes": {
+      "type": "component",
+      "component": "calculator.plank-type",
+      "repeatable": true,
+      "required": true
+    },
+    "corniceTypes": {
+      "type": "component",
+      "component": "calculator.cornice-type",
+      "repeatable": true,
+      "required": true
+    }
+  }
+}

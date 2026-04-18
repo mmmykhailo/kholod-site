@@ -430,6 +430,45 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiCalculatorSettingsCalculatorSettings
+  extends Struct.SingleTypeSchema {
+  collectionName: 'calculator_settings';
+  info: {
+    description: 'Pricing and options for both curtain calculators';
+    displayName: 'Calculator Settings';
+    pluralName: 'calculator-settings-list';
+    singularName: 'calculator-settings';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::calculator-settings.calculator-settings'
+    > &
+      Schema.Attribute.Private;
+    magnetCalculator: Schema.Attribute.Component<
+      'calculator.magnet-calculator-settings',
+      false
+    > &
+      Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    regularCalculator: Schema.Attribute.Component<
+      'calculator.regular-calculator-settings',
+      false
+    > &
+      Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   collectionName: 'categories';
   info: {
@@ -585,6 +624,13 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
+    showPageTitle: Schema.Attribute.Boolean &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Schema.Attribute.DefaultTo<false>;
     slug: Schema.Attribute.UID &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -1333,6 +1379,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::calculator-settings.calculator-settings': ApiCalculatorSettingsCalculatorSettings;
       'api::category.category': ApiCategoryCategory;
       'api::general-site-info.general-site-info': ApiGeneralSiteInfoGeneralSiteInfo;
       'api::page.page': ApiPagePage;

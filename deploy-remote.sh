@@ -293,6 +293,12 @@ Thumbs.db
 # Uploads (if you want to preserve them on VPS)
 kholod-strapi/public/uploads/
 
+# Strapi internal data (exports, etc.) — preserved on VPS
+kholod-strapi/data/
+
+# Caddy config — managed on VPS, not overridden from local
+Caddyfile
+
 # Lock files - KEEP THESE for Docker builds!
 # package-lock.json and bun.lockb are needed for npm ci / bun install
 # Only exclude yarn.lock since we don't use it

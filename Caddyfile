@@ -26,6 +26,9 @@ pvh-zavisa.com, www.pvh-zavisa.com {
     handle /uploads* {
         reverse_proxy localhost:1337
     }
+    handle /upload* {
+        reverse_proxy localhost:1337
+    }
 
     # Catch-all for React frontend
     handle {

@@ -1,0 +1,40 @@
+{
+  "collectionName": "components_calculator_magnet_settings",
+  "info": {
+    "displayName": "Magnet Calculator Settings",
+    "description": "All options for the magnetic curtain calculator"
+  },
+  "options": {},
+  "attributes": {
+    "stripTypes": {
+      "type": "component",
+      "component": "calculator.strip-type",
+      "repeatable": true,
+      "required": true
+    },
+    "plankTypes": {
+      "type": "component",
+      "component": "calculator.plank-type",
+      "repeatable": true,
+      "required": true
+    },
+    "corniceType": {
+      "type": "component",
+      "component": "calculator.cornice-type",
+      "repeatable": false,
+      "required": true
+    },
+    "defaultOverlap": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "description": "Fixed overlap in mm (usually 0 for magnetic curtains)"
+    },
+    "addExtraStrip": {
+      "type": "boolean",
+      "required": true,
+      "default": false,
+      "description": "Always add one extra strip to the calculation?"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { useActionData } from "react-router";
+import { useActionData, useLoaderData } from "react-router";
 import Container from "~/components/ui/container";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
@@ -16,6 +16,7 @@ import {
   calculateCurtainPrice,
   type CalculationResult,
 } from "~/lib/calculateCurtainPrice";
+import { fetchCalculatorSettings } from "~/lib/http";
 
 export function meta() {
   return [
@@ -24,21 +25,40 @@ export function meta() {
   ];
 }
 
-export async function clientAction({ request }: Route.ClientActionArgs) {
-  const formData = await request.formData();
+export async function clientLoader() {
+  const settings = await fetchCalculatorSettings();
+  if (!settings) {
+    throw new Error("Calculator settings unavailable");
+  }
+  return { settings };
+}
 
-  return calculateCurtainPrice({
-    width: parseFloat(formData.get("width") as string),
-    height: parseFloat(formData.get("height") as string),
-    stripType: formData.get("stripType") as string,
-    overlap: parseInt(formData.get("overlap") as string),
-    addExtraStrip: formData.get("addExtraStrip") === "true",
-    corniceType: formData.get("corniceType") as string,
-    plankType: formData.get("plankType") as string,
-  });
+export async function clientAction({ request }: Route.ClientActionArgs) {
+  const [formData, settings] = await Promise.all([
+    request.formData(),
+    fetchCalculatorSettings(),
+  ]);
+
+  if (!settings) {
+    throw new Error("Calculator settings unavailable");
+  }
+
+  return calculateCurtainPrice(
+    {
+      width: parseFloat(formData.get("width") as string),
+      height: parseFloat(formData.get("height") as string),
+      stripType: formData.get("stripType") as string,
+      overlap: parseInt(formData.get("overlap") as string),
+      addExtraStrip: formData.get("addExtraStrip") === "true",
+      corniceType: formData.get("corniceType") as string,
+      plankType: formData.get("plankType") as string,
+    },
+    settings,
+  );
 }
 
 export default function Calculator() {
+  const { settings } = useLoaderData<typeof clientLoader>();
   const result = useActionData<CalculationResult>();
 
   return (
@@ -59,10 +79,10 @@ export default function Calculator() {
                     <TabsTrigger value="magnet">Магнітні штори</TabsTrigger>
                   </TabsList>
                   <TabsContent value="regular">
-                    <RegularCalculatorForm />
+                    <RegularCalculatorForm settings={settings.regularCalculator} />
                   </TabsContent>
                   <TabsContent value="magnet">
-                    <MagnetCalculatorForm />
+                    <MagnetCalculatorForm settings={settings.magnetCalculator} />
                   </TabsContent>
                 </Tabs>
               </CardContent>

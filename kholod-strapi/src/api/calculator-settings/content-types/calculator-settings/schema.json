@@ -1,0 +1,27 @@
+{
+  "kind": "singleType",
+  "collectionName": "calculator_settings",
+  "info": {
+    "singularName": "calculator-settings",
+    "pluralName": "calculator-settings-list",
+    "displayName": "Calculator Settings",
+    "description": "Pricing and options for both curtain calculators"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "regularCalculator": {
+      "type": "component",
+      "component": "calculator.regular-calculator-settings",
+      "repeatable": false,
+      "required": true
+    },
+    "magnetCalculator": {
+      "type": "component",
+      "component": "calculator.magnet-calculator-settings",
+      "repeatable": false,
+      "required": true
+    }
+  }
+}
