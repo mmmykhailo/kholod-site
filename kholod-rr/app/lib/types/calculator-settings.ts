@@ -21,6 +21,7 @@ export type CorniceType = {
   pricePerItem: number;
   itemLength: number;
   itemFractionToCeil: number;
+  hasPlank?: boolean;
 };
 
 export type RegularCalculatorSettings = {

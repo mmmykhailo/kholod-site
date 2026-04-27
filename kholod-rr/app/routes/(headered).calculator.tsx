@@ -51,7 +51,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
       overlap: parseInt(formData.get("overlap") as string),
       addExtraStrip: formData.get("addExtraStrip") === "true",
       corniceType: formData.get("corniceType") as string,
-      plankType: formData.get("plankType") as string,
+      plankType: (formData.get("plankType") ?? undefined) as string | undefined,
     },
     settings,
   );
@@ -153,16 +153,20 @@ export default function Calculator() {
 
                     <ItemSeparator />*/}
 
-                    <Item>
-                      <ItemContent>
-                        <ItemTitle>Кількість планок</ItemTitle>
-                      </ItemContent>
-                      <ItemContent>
-                        <ItemTitle>{result.numberOfPlanks} шт</ItemTitle>
-                      </ItemContent>
-                    </Item>
+                    {result.numberOfPlanks > 0 && (
+                      <>
+                        <Item>
+                          <ItemContent>
+                            <ItemTitle>Кількість планок</ItemTitle>
+                          </ItemContent>
+                          <ItemContent>
+                            <ItemTitle>{result.numberOfPlanks} шт</ItemTitle>
+                          </ItemContent>
+                        </Item>
 
-                    <ItemSeparator />
+                        <ItemSeparator />
+                      </>
+                    )}
 
                     {/*<Item>
                       <ItemContent>

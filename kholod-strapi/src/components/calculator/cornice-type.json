@@ -30,6 +30,11 @@
       "type": "decimal",
       "required": true,
       "description": "Rounding step for partial pieces (e.g. 0.5 means round up to nearest 0.5)"
+    },
+    "hasPlank": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this cornice type requires a plank selection"
     }
   }
 }

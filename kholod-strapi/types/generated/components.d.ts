@@ -7,6 +7,7 @@ export interface CalculatorCorniceType extends Struct.ComponentSchema {
     displayName: 'Cornice Type';
   };
   attributes: {
+    hasPlank: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     itemFractionToCeil: Schema.Attribute.Decimal & Schema.Attribute.Required;
     itemLength: Schema.Attribute.Decimal & Schema.Attribute.Required;
     label: Schema.Attribute.String & Schema.Attribute.Required;

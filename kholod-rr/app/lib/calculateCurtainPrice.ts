@@ -33,7 +33,7 @@ export interface CalculationResult {
   overlap: number;
   addExtraStrip: boolean;
   corniceType: string;
-  plankType: string;
+  plankType: string | undefined;
   numberOfStrips: number;
   realCurtainWidth: number;
   totalRibbonLength: number;
@@ -55,7 +55,7 @@ export interface CalculationInput {
   overlap: number;
   addExtraStrip: boolean;
   corniceType: string;
-  plankType: string;
+  plankType?: string;
 }
 
 export function calculateCurtainPrice(
@@ -102,13 +102,12 @@ export function calculateCurtainPrice(
   const ribbonPrice = (totalRibbonLength / 1000) * ribbonPricePerMeter;
 
   // Calculate planks price
-  const numberOfPlanks = numberOfStrips;
-
   const allPlankTypes = [
     ...settings.regularCalculator.plankTypes,
     ...settings.magnetCalculator.plankTypes,
   ];
-  const plankData = allPlankTypes.find((pt) => pt.slug === plankType);
+  const plankData = plankType ? allPlankTypes.find((pt) => pt.slug === plankType) : undefined;
+  const numberOfPlanks = plankData ? numberOfStrips : 0;
   const plankPricePerPiece = plankData?.price ?? 0;
   const planksPrice = numberOfPlanks * plankPricePerPiece;
 

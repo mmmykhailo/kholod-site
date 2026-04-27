@@ -21,6 +21,10 @@ export default function RegularCalculatorForm({ settings }: Props) {
     settings.stripTypes[0]?.slug ?? "",
   );
 
+  const [selectedCorniceType, setSelectedCorniceType] = useState<string>(
+    settings.defaultCorniceType ?? settings.corniceTypes[0]?.slug ?? "",
+  );
+
   const selectedStripData = settings.stripTypes.find(
     (st) => st.slug === selectedStripType,
   );
@@ -33,6 +37,11 @@ export default function RegularCalculatorForm({ settings }: Props) {
   const defaultPlankSlug =
     availablePlankTypes.find((pt) => pt.slug === settings.defaultPlankType)?.slug ??
     availablePlankTypes[0]?.slug;
+
+  const selectedCorniceData = settings.corniceTypes.find(
+    (ct) => ct.slug === selectedCorniceType,
+  );
+  const corniceHasPlank = selectedCorniceData?.hasPlank ?? true;
 
   return (
     <Form method="post">
@@ -118,13 +127,14 @@ export default function RegularCalculatorForm({ settings }: Props) {
           </Field>
         </div>
 
-        <div className="grid grid-cols-2 gap-y-7 gap-x-4">
+        <div className={`grid gap-y-7 gap-x-4 ${corniceHasPlank ? "grid-cols-2" : "grid-cols-1"}`}>
           <Field>
             <FieldLabel htmlFor="corniceType">Тип карнізу</FieldLabel>
             <FieldContent>
               <Select
                 name="corniceType"
-                defaultValue={settings.defaultCorniceType ?? settings.corniceTypes[0]?.slug}
+                value={selectedCorniceType}
+                onValueChange={setSelectedCorniceType}
               >
                 <SelectTrigger id="corniceType">
                   <SelectValue />
@@ -140,27 +150,29 @@ export default function RegularCalculatorForm({ settings }: Props) {
             </FieldContent>
           </Field>
 
-          <Field>
-            <FieldLabel htmlFor="plankType">Тип планки</FieldLabel>
-            <FieldContent>
-              <Select
-                name="plankType"
-                defaultValue={defaultPlankSlug}
-                key={selectedStripType}
-              >
-                <SelectTrigger id="plankType">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {availablePlankTypes.map((type) => (
-                    <SelectItem key={type.slug} value={type.slug}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FieldContent>
-          </Field>
+          {corniceHasPlank && (
+            <Field>
+              <FieldLabel htmlFor="plankType">Тип планки</FieldLabel>
+              <FieldContent>
+                <Select
+                  name="plankType"
+                  defaultValue={defaultPlankSlug}
+                  key={selectedStripType}
+                >
+                  <SelectTrigger id="plankType">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availablePlankTypes.map((type) => (
+                      <SelectItem key={type.slug} value={type.slug}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FieldContent>
+            </Field>
+          )}
         </div>
       </FieldGroup>
 
