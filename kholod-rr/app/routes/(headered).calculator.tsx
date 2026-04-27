@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useActionData, useLoaderData } from "react-router";
 import Container from "~/components/ui/container";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -9,9 +10,11 @@ import {
   ItemTitle,
 } from "~/components/ui/item";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
+import { Button } from "~/components/ui/button";
 import type { Route } from "./+types/(headered).calculator";
 import RegularCalculatorForm from "~/components/calculator/RegularCalculatorForm";
 import MagnetCalculatorForm from "~/components/calculator/MagnetCalculatorForm";
+import OrderDialog from "~/components/order-dialog";
 import {
   calculateCurtainPrice,
   type CalculationResult,
@@ -57,9 +60,22 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
   );
 }
 
+function buildOrderDescription(result: CalculationResult): string {
+  const parts = [
+    `Штора ${result.width}×${result.height}мм`,
+    `${result.numberOfStrips} смуг по ${result.stripWidth}мм`,
+  ];
+  if (result.numberOfPlanks > 0) {
+    parts.push(`${result.numberOfPlanks} планок`);
+  }
+  parts.push(`вартість: ${result.totalPrice.toFixed(2)} грн`);
+  return parts.join(", ");
+}
+
 export default function Calculator() {
   const { settings } = useLoaderData<typeof clientLoader>();
   const result = useActionData<CalculationResult>();
+  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
   return (
     <div className="min-h-screen pb-16">
@@ -218,10 +234,27 @@ export default function Calculator() {
                   </ItemGroup>
                 </CardContent>
               </Card>
+
+              <Button
+                className="w-full mt-4"
+                size="lg"
+                onClick={() => setOrderDialogOpen(true)}
+              >
+                Замовити
+              </Button>
             </div>
           )}
         </div>
       </Container>
+
+      {result && (
+        <OrderDialog
+          open={orderDialogOpen}
+          onOpenChange={setOrderDialogOpen}
+          productName={buildOrderDescription(result)}
+          productUrl="/calculator"
+        />
+      )}
     </div>
   );
 }
