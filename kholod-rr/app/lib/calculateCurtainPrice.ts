@@ -85,7 +85,7 @@ export function calculateCurtainPrice(
   const effectiveStripWidth = stripWidth - overlap;
   let numberOfStrips = Math.max(
     1,
-    Math.ceil(width / effectiveStripWidth - overlap / effectiveStripWidth),
+    Math.floor((width - overlap) / effectiveStripWidth),
   );
   if (addExtraStrip) {
     numberOfStrips += 1;
